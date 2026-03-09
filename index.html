@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mes Habitudes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #060d1a;
+    --bg2: #0a1628;
+    --bg3: #0f1f3d;
+    --accent: #00c8ff;
+    --accent2: #0af;
+    --green: #00dc82;
+    --red: #ff3c3c;
+    --orange: #ffa000;
+    --yellow: #ffdc00;
+    --purple: #c864ff;
+    --pink: #ff64c8;
+    --blue: #6496ff;
+    --border: rgba(0,200,255,0.15);
+    --text: #e0f0ff;
+    --text2: #7890b0;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #060d1a 0%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .logo span { color: var(--text); }
+  .sync-btn {
+    background: linear-gradient(135deg, #003a5c, #005580);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sync-btn:active { transform: scale(0.95); background: var(--accent); color: var(--bg); }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+  }
+  .tab {
+    flex: 1;
+    padding: 7px;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    color: var(--text2);
+  }
+  .tab.active {
+    background: rgba(0,200,255,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* PAGES */
+  .page { display: none; padding: 12px; }
+  .page.active { display: block; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text2);
+    text-transform: uppercase;
+    margin: 16px 0 8px;
+    padding-left: 4px;
+    border-left: 3px solid var(--accent);
+    padding-left: 8px;
+  }
+
+  /* HABITUDES */
+  .hab-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hab-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  .hab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .hab-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .hab-pct {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .hab-freq {
+    font-size: 10px;
+    color: var(--text2);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .hab-bar-bg {
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .hab-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .hab-streak {
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .hab-streak span { color: var(--orange); font-weight: 600; }
+
+  /* SCORE GLOBAL */
+  .score-card {
+    background: linear-gradient(135deg, var(--bg2), var(--bg3));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .score-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 3px solid;
+    position: relative;
+  }
+  .score-circle-val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .score-info { flex: 1; }
+  .score-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text2);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .score-month {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .score-sub {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  /* CALENDRIER */
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 4px;
+    margin-bottom: 8px;
+  }
+  .cal-month {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .cal-nav {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .cal-nav:active { background: var(--accent); color: var(--bg); }
+
+  .cal-hab-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .cal-hab-title {
+    padding: 10px 12px 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cal-hab-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* GRILLE JOURS */
+  .days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 6px 8px 2px;
+    gap: 3px;
+  }
+  .day-label {
+    text-align: center;
+    font-size: 9px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text2);
+    padding: 3px 0;
+  }
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 4px 8px 10px;
+    gap: 3px;
+  }
+  .day-cell {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    position: relative;
+  }
+  .day-cell.inactive {
+    background: rgba(255,255,255,0.02);
+    color: rgba(255,255,255,0.1);
+    cursor: default;
+    border-color: rgba(255,255,255,0.04);
+  }
+  .day-cell.active {
+    background: rgba(0,0,0,0.3);
+    color: rgba(160,210,255,0.7);
+  }
+  .day-cell.active:active { transform: scale(0.9); }
+  .day-cell.checked {
+    color: white;
+    font-weight: 700;
+  }
+  .day-cell.today-marker::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 16px;
+  }
+  .loading-icon {
+    font-size: 40px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .loading-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--text2);
+    text-transform: uppercase;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.95); }
+  }
+
+  /* EMPTY */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text2);
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--bg3);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🔥 <span>MES</span> HABITUDES</div>
+    <button class="sync-btn" onclick="syncNow()">↻ SYNC</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showPage('habitudes')">📊 HABITUDES</div>
+    <div class="tab" onclick="showPage('calendrier')">📅 CALENDRIER</div>
+  </div>
+</div>
+
+<div id="page-habitudes" class="page active">
+  <div id="habitudes-content">
+    <div class="loading">
+      <div class="loading-icon">🔥</div>
+      <div class="loading-text">Chargement...</div>
+    </div>
+  </div>
+</div>
+
+<div id="page-calendrier" class="page">
+  <div class="cal-header">
+    <div class="cal-nav" onclick="changeMonth(-1)">‹</div>
+    <div class="cal-month" id="cal-month-title">—</div>
+    <div class="cal-nav" onclick="changeMonth(1)">›</div>
+  </div>
+  <div id="calendrier-content">
+    <div class="loading">
+      <div class="loading-icon">📅</div>
+      <div class="loading-text">Chargement...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBjWyHxE9c7EWPp_0NjUaNGglGs-nBAys0",
+  authDomain: "mes-habitudes-c22ce.firebaseapp.com",
+  databaseURL: "https://mes-habitudes-c22ce-default-rtdb.firebaseio.com",
+  projectId: "mes-habitudes-c22ce",
+  storageBucket: "mes-habitudes-c22ce.firebasestorage.app",
+  messagingSenderId: "484575815535",
+  appId: "1:484575815535:web:b2e5cde0cc1581b1ecea9a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Récupérer userId depuis URL
+const params = new URLSearchParams(window.location.search);
+const userId = params.get('uid');
+
+let userData = null;
+let currentMonth = new Date().getMonth() + 1;
+let currentYear = new Date().getFullYear();
+
+const COULEURS = {
+  0: '#00dc82',
+  1: '#ff6464',
+  2: '#6496ff',
+  3: '#ffb400',
+  4: '#c864ff',
+  5: '#ff64c8'
+};
+
+if (!userId) {
+  document.getElementById('habitudes-content').innerHTML = `
+    <div class="empty">❌ QR Code invalide<br><br>Régénère le QR Code depuis Excel</div>`;
+} else {
+  // Écoute temps réel
+  const userRef = ref(db, 'users/' + userId);
+  onValue(userRef, (snapshot) => {
+    userData = snapshot.val();
+    renderHabitudes();
+    renderCalendrier();
+  });
+}
+
+function renderHabitudes() {
+  const container = document.getElementById('habitudes-content');
+  if (!userData || !userData.habitudes) {
+    container.innerHTML = `<div class="empty">Aucune habitude trouvée<br><br>Synchronise depuis Excel d'abord</div>`;
+    return;
+  }
+
+  const habs = userData.habitudes;
+  const keys = Object.keys(habs);
+  
+  // Score global
+  let totalPct = 0;
+  let nb = 0;
+  keys.forEach(k => {
+    if (habs[k].pct !== undefined) { totalPct += habs[k].pct; nb++; }
+  });
+  const moyenne = nb > 0 ? Math.round(totalPct / nb) : 0;
+  
+  let coulScore = moyenne < 26 ? '#ff3c3c' : moyenne < 51 ? '#ffa000' : moyenne < 76 ? '#ffdc00' : '#00dc82';
+  
+  const monthNames = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+  let html = `
+    <div class="score-card">
+      <div class="score-circle" style="border-color:${coulScore}">
+        <div class="score-circle-val" style="color:${coulScore}">${moyenne}%</div>
+      </div>
+      <div class="score-info">
+        <div class="score-label">Score de focus</div>
+        <div class="score-month">${monthNames[currentMonth]} ${currentYear}</div>
+        <div class="score-sub">${nb} habitude${nb>1?'s':''} suivie${nb>1?'s':''}</div>
+      </div>
+    </div>
+    <div class="section-title">Mes habitudes</div>
+  `;
+
+  keys.forEach((k, i) => {
+    const h = habs[k];
+    const coul = COULEURS[i % 6];
+    const pct = h.pct || 0;
+    const streak = h.streak || 0;
+    html += `
+      <div class="hab-card" style="border-left-color:${coul}">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${coul};border-radius:3px 0 0 3px"></div>
+        <div class="hab-header">
+          <div class="hab-name" style="color:${coul}">${h.nom || k}</div>
+          <div class="hab-pct" style="color:${coul}">${pct}%</div>
+        </div>
+        <div class="hab-freq">${h.frequence || ''}</div>
+        <div class="hab-bar-bg">
+          <div class="hab-bar-fill" style="width:${pct}%;background:${coul}"></div>
+        </div>
+        <div class="hab-streak">🔥 <span>${streak} jours</span> consécutifs</div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderCalendrier() {
+  const container = document.getElementById('calendrier-content');
+  const monthNames = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  document.getElementById('cal-month-title').textContent = monthNames[currentMonth] + ' ' + currentYear;
+  
+  if (!userData || !userData.habitudes) {
+    container.innerHTML = `<div class="empty">Synchronise depuis Excel d'abord</div>`;
+    return;
+  }
+
+  const habs = userData.habitudes;
+  const keys = Object.keys(habs);
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  const today = new Date();
+  const dayNames = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+
+  let html = '';
+
+  keys.forEach((k, i) => {
+    const h = habs[k];
+    const coul = COULEURS[i % 6];
+    const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
+    const cases = (userData.cases && userData.cases[k]) ? userData.cases[k] : {};
+
+    html += `
+      <div class="cal-hab-section">
+        <div class="cal-hab-title">
+          <div class="cal-hab-dot" style="background:${coul}"></div>
+          <span style="color:${coul}">${h.nom || k}</span>
+        </div>
+        <div class="days-header">
+          ${dayNames.map(d => `<div class="day-label">${d}</div>`).join('')}
+        </div>
+        <div class="days-grid">
+    `;
+
+    // Premier jour du mois (0=dim, 1=lun...)
+    const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
+
+    // Cellules vides avant le 1er
+    for (let i = 0; i < offset; i++) {
+      html += `<div class="day-cell inactive"></div>`;
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateObj = new Date(currentYear, currentMonth - 1, d);
+      const jourSem = dateObj.getDay() === 0 ? 7 : dateObj.getDay(); // 1=lun, 7=dim
+      const isActif = joursActifs.includes(jourSem);
+      const dateKey = String(d).padStart(2,'0') + String(currentMonth).padStart(2,'0') + currentYear;
+      const isCoche = cases[dateKey] === true;
+      const isToday = today.getDate() === d && today.getMonth()+1 === currentMonth && today.getFullYear() === currentYear;
+
+      if (!isActif) {
+        html += `<div class="day-cell inactive">${d}</div>`;
+      } else if (isCoche) {
+        html += `<div class="day-cell checked ${isToday?'today-marker':''}" 
+          style="background:${coul};border-color:${coul}" 
+          onclick="toggleCase('${k}','${dateKey}',true,'${coul}')">${d}</div>`;
+      } else {
+        html += `<div class="day-cell active ${isToday?'today-marker':''}" 
+          style="border-color:${coul}33" 
+          onclick="toggleCase('${k}','${dateKey}',false,'${coul}')">${d}</div>`;
+      }
+    }
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html || `<div class="empty">Aucune habitude à afficher</div>`;
+}
+
+window.toggleCase = async function(habKey, dateKey, wasCoche, coul) {
+  if (!userId) return;
+  const newVal = !wasCoche;
+  const path = `users/${userId}/cases/${habKey}/${dateKey}`;
+  await set(ref(db, path), newVal);
+  showToast(newVal ? '✅ Coché !' : '○ Décoché');
+  // Recalculer pct
+  recalcPct(habKey);
+};
+
+async function recalcPct(habKey) {
+  if (!userData || !userData.habitudes || !userData.habitudes[habKey]) return;
+  const h = userData.habitudes[habKey];
+  const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  const cases = (userData.cases && userData.cases[habKey]) ? userData.cases[habKey] : {};
+
+  let totalA = 0, totalC = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateObj = new Date(currentYear, currentMonth - 1, d);
+    const jourSem = dateObj.getDay() === 0 ? 7 : dateObj.getDay();
+    if (joursActifs.includes(jourSem)) {
+      totalA++;
+      const dateKey = String(d).padStart(2,'0') + String(currentMonth).padStart(2,'0') + currentYear;
+      if (cases[dateKey]) totalC++;
+    }
+  }
+  const pct = totalA > 0 ? Math.round((totalC / totalA) * 100) : 0;
+  await set(ref(db, `users/${userId}/habitudes/${habKey}/pct`), pct);
+  await set(ref(db, `users/${userId}/habitudes/${habKey}/streak`), totalC);
+}
+
+window.changeMonth = function(dir) {
+  currentMonth += dir;
+  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+  if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+  renderCalendrier();
+};
+
+window.showPage = function(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.target.classList.add('active');
+};
+
+window.syncNow = function() {
+  showToast('↻ Synchronisation...');
+  if (userData) { renderHabitudes(); renderCalendrier(); showToast('✅ Synchronisé !'); }
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
