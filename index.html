@@ -1,391 +1,476 @@
-Sub SyncFirebase()
-    Dim userId As String: userId = ObtenirUserId()
-    If userId = "" Then Exit Sub
-    Application.StatusBar = "Sync en cours..."
-    Application.Cursor = xlWait
-    Application.ScreenUpdating = False
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mes Habitudes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap');
+  :root {
+    --bg:#060d1a; --bg2:#0a1628; --bg3:#0f1f3d;
+    --accent:#00c8ff; --green:#00dc82; --red:#ff3c3c;
+    --orange:#ffa000; --yellow:#ffdc00; --purple:#c864ff;
+    --pink:#ff64c8; --blue:#6496ff;
+    --border:rgba(0,200,255,0.15); --text:#e0f0ff; --text2:#7890b0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:110px;}
+  .header{background:linear-gradient(135deg,#060d1a,#0a1628);border-bottom:1px solid var(--border);padding:14px 16px 10px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+  .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .logo{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;}
+  .logo span{color:var(--text);}
+  .sync-btn{background:linear-gradient(135deg,#003a5c,#005580);border:1px solid var(--accent);color:var(--accent);padding:6px 14px;border-radius:20px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;}
+  .sync-btn:active{transform:scale(.95);background:var(--accent);color:var(--bg);}
+  .tabs{display:flex;gap:6px;}
+  .tab{flex:1;padding:7px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all .2s;border:1px solid transparent;color:var(--text2);}
+  .tab.active{background:rgba(0,200,255,.12);border-color:var(--accent);color:var(--accent);}
+  .page{display:none;padding:12px;}
+  .page.active{display:block;}
+  .section-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin:16px 0 8px;border-left:3px solid var(--accent);padding-left:8px;}
+  .hab-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden;}
+  .hab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .hab-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;}
+  .hab-pct{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;}
+  .hab-freq{font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:6px;}
+  .hab-bar-bg{background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px;}
+  .hab-bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+  .hab-streak{font-size:11px;color:var(--text2);}
+  .hab-streak span{color:var(--orange);font-weight:600;}
+  .score-card{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;}
+  .score-circle{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid;}
+  .score-circle-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
+  .score-info{flex:1;}
+  .score-label{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:4px;}
+  .score-month{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);}
+  .score-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+  .cal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;margin-bottom:8px;}
+  .cal-month{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:1px;}
+  .cal-nav{background:var(--bg3);border:1px solid var(--border);color:var(--accent);width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;}
+  .cal-nav:active{background:var(--accent);color:var(--bg);}
+  .cal-hab-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+  .cal-hab-title{padding:10px 12px 8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .cal-hab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .days-header{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 8px 2px;gap:3px;}
+  .day-label{text-align:center;font-size:9px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px;color:var(--text2);padding:3px 0;}
+  .days-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:4px 8px 10px;gap:3px;}
+  .day-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid transparent;position:relative;}
+  .day-cell.inactive{background:rgba(255,255,255,.02);color:rgba(255,255,255,.1);cursor:default;border-color:rgba(255,255,255,.04);}
+  .day-cell.active{background:rgba(0,0,0,.3);color:rgba(160,210,255,.7);}
+  .day-cell.active:active{transform:scale(.9);}
+  .day-cell.checked{color:white;font-weight:700;}
+  .day-cell.today-marker::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent);}
+  .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+  .loading-icon{font-size:40px;animation:pulse 1.5s ease-in-out infinite;}
+  .loading-text{font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.95)}}
+  .empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px;letter-spacing:1px;}
 
-    ' NOUVEAU : importer nouvelles habitudes mobiles
-    ImporterHabitudesMobiles userId
+  /* FAB */
+  .fab{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0078a8);border:none;color:var(--bg);font-size:32px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(0,200,255,.5);transition:transform .2s,box-shadow .2s;font-weight:700;}
+  .fab:active{transform:translateX(-50%) scale(.92);}
 
-    SyncCasesBiDirectionnel userId
-    ExporterHabitudesSeulement userId
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);}
+  .modal-overlay.show{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-width:480px;animation:slideUp .3s ease;max-height:90vh;overflow-y:auto;}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+  .modal-close-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .form-group{margin-bottom:16px;}
+  .form-label{font-size:11px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:block;}
+  .form-input{width:100%;padding:12px 14px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Exo 2',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
+  .form-input:focus{border-color:var(--accent);}
+  .form-input::placeholder{color:var(--text2);}
 
-    Application.ScreenUpdating = True
-    Application.StatusBar = "Sync terminee !"
-    Application.Cursor = xlDefault
-End Sub
+  /* FREQ BUTTONS */
+  .freq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+  .freq-btn{padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;letter-spacing:.5px;}
+  .freq-btn.selected{background:rgba(0,200,255,.15);border-color:var(--accent);color:var(--accent);}
 
-Sub ImporterHabitudesMobiles(userId As String)
-    Dim response As String
-    response = LireFirebase(FIREBASE_URL & "/users/" & userId & "/habitudes.json")
-    If response = "null" Or response = "" Or Len(response) < 5 Then Exit Sub
+  /* COULEUR BUTTONS */
+  .couleur-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+  .couleur-btn{aspect-ratio:1;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .couleur-btn.selected{border-color:white;transform:scale(1.15);}
 
-    Dim ws As Worksheet: Set ws = Sheets("Mes Habitudes")
+  .submit-btn{width:100%;padding:14px;border-radius:14px;margin-top:20px;background:linear-gradient(135deg,var(--accent),#0078a8);border:none;color:var(--bg);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .2s;letter-spacing:1px;}
+  .submit-btn:hover{opacity:.9;}
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
 
-    ' Compter habitudes existantes dans Excel
-    Dim lignesHab(5) As Integer
-    lignesHab(0) = 13: lignesHab(1) = 15: lignesHab(2) = 17
-    lignesHab(3) = 19: lignesHab(4) = 21: lignesHab(5) = 23
+  .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--accent);color:var(--accent);padding:10px 20px;border-radius:20px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;transition:transform .3s ease;z-index:999;white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
 
-    ' Collecter cles deja connues (hab_0 a hab_5)
-    Dim dicoClesConnues As Object
-    Set dicoClesConnues = CreateObject("Scripting.Dictionary")
-    Dim idx As Integer
-    For idx = 0 To 5
-        dicoClesConnues("hab_" & idx) = True
-    Next idx
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🔥 <span>MES</span> HABITUDES</div>
+    <button class="sync-btn" onclick="syncNow()">↻ SYNC</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showPage('habitudes',event)">📊 HABITUDES</div>
+    <div class="tab" onclick="showPage('calendrier',event)">📅 CALENDRIER</div>
+  </div>
+</div>
 
-    ' Parser les cles Firebase pour trouver hab_mob_xxxx
-    Dim pos As Long: pos = 2
-    Dim nbNouveaux As Integer: nbNouveaux = 0
+<div id="page-habitudes" class="page active">
+  <div id="habitudes-content">
+    <div class="loading"><div class="loading-icon">🔥</div><div class="loading-text">Chargement...</div></div>
+  </div>
+</div>
 
-    Do While pos < Len(response)
-        Dim p1 As Long: p1 = InStr(pos, response, """")
-        If p1 = 0 Then Exit Do
-        Dim p2 As Long: p2 = InStr(p1 + 1, response, """")
-        If p2 = 0 Then Exit Do
-        Dim cle As String: cle = Mid(response, p1 + 1, p2 - p1 - 1)
+<div id="page-calendrier" class="page">
+  <div class="cal-header">
+    <div class="cal-nav" onclick="changeMonth(-1)">‹</div>
+    <div class="cal-month" id="cal-month-title">—</div>
+    <div class="cal-nav" onclick="changeMonth(1)">›</div>
+  </div>
+  <div id="calendrier-content">
+    <div class="loading"><div class="loading-icon">📅</div><div class="loading-text">Chargement...</div></div>
+  </div>
+</div>
 
-        Dim pBlocOpen As Long: pBlocOpen = InStr(p2 + 1, response, "{")
-        If pBlocOpen = 0 Then Exit Do
-        Dim depth As Integer: depth = 1
-        Dim pScan As Long: pScan = pBlocOpen + 1
-        Do While pScan <= Len(response) And depth > 0
-            Dim cc As String: cc = Mid(response, pScan, 1)
-            If cc = "{" Then depth = depth + 1
-            If cc = "}" Then depth = depth - 1
-            pScan = pScan + 1
-        Loop
-        Dim bloc As String: bloc = Mid(response, pBlocOpen, pScan - pBlocOpen)
+<!-- FAB -->
+<button class="fab" onclick="ouvrirModal()">+</button>
 
-        ' Traiter seulement les cles mobiles non encore importees
-        If Left(cle, 8) = "hab_mob_" And Not dicoClesConnues.exists(cle) Then
-            Dim nomVal  As String: nomVal  = ExtraireChampJSON(bloc, "nom")
-            Dim freqVal As String: freqVal = ExtraireChampJSON(bloc, "frequence")
-            Dim rangVal As String: rangVal = ExtraireChampJSON(bloc, "rang")
+<!-- MODAL AJOUT HABITUDE -->
+<div class="modal-overlay" id="modal-overlay" onclick="fermerModalOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">
+      ➕ NOUVELLE HABITUDE
+      <button class="modal-close-btn" onclick="fermerModal()">✕</button>
+    </div>
 
-            If nomVal <> "" Then
-                ' Trouver ligne libre dans Excel
-                Dim ligneTarget As Integer: ligneTarget = -1
-                Dim i As Integer
-                For i = 0 To 5
-                    Dim existe As Boolean: existe = False
-                    Dim shpTest As Shape
-                    For Each shpTest In ws.Shapes
-                        If shpTest.Name = "Hab_nom_" & lignesHab(i) Then
-                            existe = True: Exit For
-                        End If
-                    Next shpTest
-                    If Not existe Then
-                        ligneTarget = lignesHab(i)
-                        Exit For
-                    End If
-                Next i
+    <div class="form-group">
+      <label class="form-label">Nom de l'habitude</label>
+      <input class="form-input" id="inp-nom" type="text" placeholder="Ex: Sport, Lecture..."/>
+    </div>
 
-                If ligneTarget = -1 Then
-                    ' Max atteint, skip
-                    GoTo SuiteCle
-                End If
+    <div class="form-group">
+      <label class="form-label">Fréquence</label>
+      <div class="freq-grid">
+        <button class="freq-btn selected" data-freq="Quotidien" onclick="selFreq(this)">📅 Quotidien</button>
+        <button class="freq-btn" data-freq="Lun, Mer, Ven" onclick="selFreq(this)">📆 Lun, Mer, Ven</button>
+        <button class="freq-btn" data-freq="Mar, Jeu, Sam" onclick="selFreq(this)">📆 Mar, Jeu, Sam</button>
+        <button class="freq-btn" data-freq="Hebdomadaire" onclick="selFreq(this)">🗓 Hebdomadaire</button>
+      </div>
+    </div>
 
-                ' Determiner frequence
-                If freqVal = "" Then freqVal = "Quotidien"
-                Dim joursActifs() As Integer
-                Select Case freqVal
-                    Case "Quotidien"
-                        ReDim joursActifs(6)
-                        joursActifs(0)=1:joursActifs(1)=2:joursActifs(2)=3
-                        joursActifs(3)=4:joursActifs(4)=5:joursActifs(5)=6:joursActifs(6)=7
-                    Case "Lun, Mer, Ven"
-                        ReDim joursActifs(2)
-                        joursActifs(0)=1:joursActifs(1)=3:joursActifs(2)=5
-                    Case "Mar, Jeu, Sam"
-                        ReDim joursActifs(2)
-                        joursActifs(0)=2:joursActifs(1)=4:joursActifs(2)=6
-                    Case "Hebdomadaire"
-                        ReDim joursActifs(0)
-                        joursActifs(0)=1
-                    Case Else
-                        ReDim joursActifs(6)
-                        joursActifs(0)=1:joursActifs(1)=2:joursActifs(2)=3
-                        joursActifs(3)=4:joursActifs(4)=5:joursActifs(5)=6:joursActifs(6)=7
-                End Select
+    <div class="form-group">
+      <label class="form-label">Couleur</label>
+      <div class="couleur-grid" id="couleur-grid">
+        <button class="couleur-btn selected" data-rang="0" style="background:#00dc82" onclick="selCouleur(this)"></button>
+        <button class="couleur-btn" data-rang="1" style="background:#ff6464" onclick="selCouleur(this)"></button>
+        <button class="couleur-btn" data-rang="2" style="background:#6496ff" onclick="selCouleur(this)"></button>
+        <button class="couleur-btn" data-rang="3" style="background:#ffb400" onclick="selCouleur(this)"></button>
+        <button class="couleur-btn" data-rang="4" style="background:#c864ff" onclick="selCouleur(this)"></button>
+        <button class="couleur-btn" data-rang="5" style="background:#ff64c8" onclick="selCouleur(this)"></button>
+      </div>
+    </div>
 
-                ' Determiner rang/couleur
-                Dim rangNum As Integer: rangNum = RangDepuisLigne(ligneTarget)
-                Dim couleur As Long: couleur = CouleurHabitude(rangNum)
+    <button class="submit-btn" id="submit-btn" onclick="ajouterHabitude()">
+      ✅ AJOUTER L'HABITUDE
+    </button>
+  </div>
+</div>
 
-                ' Creer la forme dans Excel (meme logique que AjouterHabitude)
-                ' On simule AjouterHabitude avec les valeurs mobiles
-                Dim saveNom As String
-                ' Appel direct de la creation
-                Call CreerHabitureDepuisMobile(ws, ligneTarget, nomVal, freqVal, joursActifs, couleur)
+<div class="toast" id="toast"></div>
 
-                ' Renommer la cle Firebase de hab_mob_xxxx vers hab_X
-                Dim idxNew As Integer
-                Select Case ligneTarget
-                    Case 13: idxNew = 0
-                    Case 15: idxNew = 1
-                    Case 17: idxNew = 2
-                    Case 19: idxNew = 3
-                    Case 21: idxNew = 4
-                    Case 23: idxNew = 5
-                End Select
-                Dim newKey As String: newKey = "hab_" & idxNew
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-                ' Copier les cases si elles existent
-                Dim casesResp As String
-                casesResp = LireFirebase(FIREBASE_URL & "/users/" & userId & "/cases/" & cle & ".json")
-                If casesResp <> "null" And Len(casesResp) > 5 Then
-                    EnvoyerFirebase FIREBASE_URL & "/users/" & userId & "/cases/" & newKey & ".json", casesResp, "PUT"
-                End If
+const firebaseConfig = {
+  apiKey: "AIzaSyBjWyHxE9c7EWPp_0NjUaNGglGs-nBAys0",
+  authDomain: "mes-habitudes-c22ce.firebaseapp.com",
+  databaseURL: "https://mes-habitudes-c22ce-default-rtdb.firebaseio.com",
+  projectId: "mes-habitudes-c22ce",
+  storageBucket: "mes-habitudes-c22ce.firebasestorage.app",
+  messagingSenderId: "484575815535",
+  appId: "1:484575815535:web:b2e5cde0cc1581b1ecea9a"
+};
 
-                ' Copier l'habitude avec la nouvelle cle
-                Dim jsonHab As String
-                jsonHab = "{""nom"":""" & nomVal & """," & _
-                           """frequence"":""" & freqVal & """," & _
-                           """joursActifs"":" & JoursVersJSON(joursActifs) & "," & _
-                           """pct"":0,""streak"":0,""source"":""excel""}"
-                EnvoyerFirebase FIREBASE_URL & "/users/" & userId & "/habitudes/" & newKey & ".json", jsonHab, "PUT"
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-                ' Supprimer l'ancienne cle mobile
-                EnvoyerFirebase FIREBASE_URL & "/users/" & userId & "/habitudes/" & cle & ".json", "null", "PUT"
-                EnvoyerFirebase FIREBASE_URL & "/users/" & userId & "/cases/" & cle & ".json", "null", "PUT"
+const params = new URLSearchParams(window.location.search);
+const userId = params.get('uid');
 
-                nbNouveaux = nbNouveaux + 1
-                dicoClesConnues(cle) = True
-            End If
-        End If
-SuiteCle:
-        pos = pScan
-    Loop
+let userData = null;
+let currentMonth = new Date().getMonth() + 1;
+let currentYear  = new Date().getFullYear();
+let freqSelectionnee  = "Quotidien";
+let rangSelectionne   = 0;
 
-    If nbNouveaux > 0 Then
-        Call Module2.MettreAJourTailleTexte
-        MsgBox nbNouveaux & " nouvelle(s) habitude(s) importee(s) depuis le telephone !", vbInformation
-    End If
-End Sub
+const COULEURS = {0:'#00dc82',1:'#ff6464',2:'#6496ff',3:'#ffb400',4:'#c864ff',5:'#ff64c8'};
+const FREQ_JOURS = {
+  "Quotidien":    [1,2,3,4,5,6,7],
+  "Lun, Mer, Ven":[1,3,5],
+  "Mar, Jeu, Sam":[2,4,6],
+  "Hebdomadaire": [1]
+};
+const MOIS_FR = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const JOURS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 
-Sub CreerHabitureDepuisMobile(ws As Worksheet, ligneTarget As Integer, nomHabitude As String, nomFreq As String, joursActifs() As Integer, couleur As Long)
-    Dim cellHab  As Range: Set cellHab  = ws.Cells(ligneTarget, 4)
-    Dim cellFreq As Range: Set cellFreq = ws.Cells(ligneTarget, 5)
-    Dim cellProg As Range: Set cellProg = ws.Cells(ligneTarget, 6)
-    Dim cellStr  As Range: Set cellStr  = ws.Cells(ligneTarget, 7)
+if (!userId) {
+  document.getElementById('habitudes-content').innerHTML =
+    `<div class="empty">❌ QR Code invalide<br><br>Régénère le QR Code depuis Excel</div>`;
+} else {
+  const userRef = ref(db, 'users/' + userId);
+  onValue(userRef, snapshot => {
+    userData = snapshot.val();
+    renderHabitudes();
+    renderCalendrier();
+  });
+}
 
-    Dim cellH   As Double: cellH   = cellHab.Height
-    Dim hTexte  As Double: hTexte  = 17
-    Dim hFreq   As Double: hFreq   = 13
-    Dim hBarre  As Double: hBarre  = 8.5
-    Dim dCercle As Double: dCercle = 14
-    Dim tTexte  As Integer: tTexte = 10
-    Dim marge   As Double: marge   = 2
-    Dim decal   As Double: decal   = 3
+// ===== RENDER HABITUDES =====
+function renderHabitudes() {
+  const container = document.getElementById('habitudes-content');
+  if (!userData || !userData.habitudes) {
+    container.innerHTML = `<div class="empty">Aucune habitude trouvée<br><br>Synchronise depuis Excel ou ajoute avec +</div>`;
+    return;
+  }
+  const habs = userData.habitudes;
+  const keys = Object.keys(habs);
+  let totalPct = 0, nb = 0;
+  keys.forEach(k => { if (habs[k] && habs[k].pct !== undefined) { totalPct += habs[k].pct; nb++; } });
+  const moyenne = nb > 0 ? Math.round(totalPct / nb) : 0;
+  const coulScore = moyenne < 26 ? '#ff3c3c' : moyenne < 51 ? '#ffa000' : moyenne < 76 ? '#ffdc00' : '#00dc82';
 
-    Dim yBase   As Double: yBase   = cellHab.Top
-    Dim yCercle As Double: yCercle = yBase + (cellH - dCercle) / 2 + decal
-    Dim yTexte  As Double: yTexte  = yBase + (cellH - hTexte)  / 2 + decal
-    Dim yFreq   As Double: yFreq   = yBase + (cellH - hFreq)   / 2 + decal
-    Dim yBarre  As Double: yBarre  = yBase + (cellH - hBarre)  / 2 + decal
-    Dim yPct    As Double: yPct    = yTexte + 3
+  let html = `
+    <div class="score-card">
+      <div class="score-circle" style="border-color:${coulScore}">
+        <div class="score-circle-val" style="color:${coulScore}">${moyenne}%</div>
+      </div>
+      <div class="score-info">
+        <div class="score-label">Score de focus</div>
+        <div class="score-month">${MOIS_FR[currentMonth]} ${currentYear}</div>
+        <div class="score-sub">${nb} habitude${nb>1?'s':''} suivie${nb>1?'s':''}</div>
+      </div>
+    </div>
+    <div class="section-title">Mes habitudes</div>
+  `;
 
-    Dim xCercle As Double: xCercle = cellHab.Left + 3
-    Dim xNom    As Double: xNom    = cellHab.Left + dCercle + 6
-    Dim xFreq   As Double: xFreq   = cellFreq.Left + marge
-    Dim xProg   As Double: xProg   = cellProg.Left + marge
-    Dim xPct    As Double: xPct    = cellProg.Left + cellProg.Width - 36
-    Dim xIco    As Double: xIco    = cellStr.Left + 3
-    Dim xStreak As Double: xStreak = cellStr.Left + dCercle + 5
+  keys.forEach((k, i) => {
+    const h = habs[k];
+    if (!h || !h.nom) return;
+    const coul = COULEURS[i % 6];
+    const pct = h.pct || 0;
+    const streak = h.streak || 0;
+    const today = new Date();
+    const todayKey = String(today.getDate()).padStart(2,'0') +
+      String(today.getMonth()+1).padStart(2,'0') + today.getFullYear();
+    const isTodayCoche = userData.cases && userData.cases[k] && userData.cases[k][todayKey] === true;
+    const isMob = k.includes('_mob_');
 
-    Dim lFreq   As Double: lFreq   = cellFreq.Width - (marge * 2)
-    Dim lBarre  As Double: lBarre  = cellProg.Width - 40
-    Dim lNom    As Double: lNom    = cellHab.Width - dCercle - 10
-    Dim lStreak As Double: lStreak = cellStr.Width - dCercle - 8
+    html += `
+      <div class="hab-card" style="border-color:${coul}33">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${coul};border-radius:3px 0 0 3px"></div>
+        <div class="hab-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="hab-name" style="color:${coul}">${h.nom}</div>
+            ${isMob ? `<span style="font-size:10px;color:var(--accent);background:rgba(0,200,255,.1);padding:1px 6px;border-radius:8px">📱</span>` : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${isTodayCoche ? `<span style="font-size:11px;color:${coul};background:${coul}22;padding:2px 8px;border-radius:10px;font-weight:700">✓ Auj.</span>` : ''}
+            <div class="hab-pct" style="color:${coul}">${pct}%</div>
+          </div>
+        </div>
+        <div class="hab-freq">${h.frequence || ''}</div>
+        <div class="hab-bar-bg">
+          <div class="hab-bar-fill" style="width:${pct}%;background:${coul}"></div>
+        </div>
+        <div class="hab-streak">🔥 <span>${streak} jours</span> consécutifs</div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
 
-    ' Cercle
-    Dim cercle As Shape
-    Set cercle = ws.Shapes.AddShape(msoShapeOval, xCercle, yCercle, dCercle, dCercle)
-    cercle.Name = "Hab_cercle_" & ligneTarget
-    With cercle
-        .Fill.ForeColor.RGB = couleur
-        .Line.ForeColor.RGB = couleur: .Line.Weight = 1
-        With .TextFrame2
-            .MarginLeft=0:.MarginTop=0:.MarginBottom=0:.MarginRight=0
-            .VerticalAnchor = msoAnchorMiddle
-            With .TextRange
-                .Text = "P": .ParagraphFormat.Alignment = msoAlignCenter
-                With .Font
-                    .Fill.ForeColor.RGB = RGB(255,255,255)
-                    .Size=9:.Bold=msoTrue:.Name="Wingdings"
-                End With
-            End With
-        End With
-    End With
+// ===== RENDER CALENDRIER =====
+function renderCalendrier() {
+  const container = document.getElementById('calendrier-content');
+  document.getElementById('cal-month-title').textContent = MOIS_FR[currentMonth] + ' ' + currentYear;
+  if (!userData || !userData.habitudes) {
+    container.innerHTML = `<div class="empty">Synchronise depuis Excel d'abord</div>`;
+    return;
+  }
+  const habs = userData.habitudes;
+  const keys = Object.keys(habs);
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  const today = new Date();
+  const dayNames = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+  let html = '';
 
-    ' Nom
-    Dim nomShape As Shape
-    Set nomShape = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, xNom, yTexte, lNom, hTexte)
-    nomShape.Name = "Hab_nom_" & ligneTarget
-    With nomShape
-        .Fill.Visible=msoFalse:.Line.Visible=msoFalse
-        With .TextFrame2
-            .MarginLeft=0:.MarginTop=0:.MarginBottom=0:.MarginRight=0
-            .VerticalAnchor=msoAnchorMiddle
-            With .TextRange
-                .Text = nomHabitude
-                With .Font
-                    .Fill.ForeColor.RGB=RGB(255,255,255)
-                    .Size=tTexte:.Bold=msoTrue:.Name="Aptos Narrow"
-                End With
-            End With
-        End With
-    End With
+  keys.forEach((k, i) => {
+    const h = habs[k];
+    if (!h || !h.nom) return;
+    const coul = COULEURS[i % 6];
+    const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
+    const cases = (userData.cases && userData.cases[k]) ? userData.cases[k] : {};
 
-    ' Badge freq
-    Dim badgeFreq As Shape
-    Set badgeFreq = ws.Shapes.AddShape(msoShapeRoundedRectangle, xFreq, yFreq, lFreq, hFreq)
-    badgeFreq.Name = "Hab_freq_" & ligneTarget
-    With badgeFreq
-        .Fill.ForeColor.RGB=RGB(10,30,60)
-        .Line.ForeColor.RGB=couleur:.Line.Weight=1
-        .Adjustments.Item(1)=0.45
-        With .TextFrame2
-            .MarginLeft=3:.MarginTop=0:.MarginBottom=0:.MarginRight=3
-            .VerticalAnchor=msoAnchorMiddle
-            With .TextRange
-                .Text=nomFreq:.ParagraphFormat.Alignment=msoAlignCenter
-                With .Font
-                    .Fill.ForeColor.RGB=couleur
-                    .Size=10:.Bold=msoTrue:.Name="Aptos Narrow"
-                End With
-            End With
-        End With
-    End With
+    html += `
+      <div class="cal-hab-section">
+        <div class="cal-hab-title">
+          <div class="cal-hab-dot" style="background:${coul}"></div>
+          <span style="color:${coul}">${h.nom}</span>
+        </div>
+        <div class="days-header">${dayNames.map(d=>`<div class="day-label">${d}</div>`).join('')}</div>
+        <div class="days-grid">
+    `;
+    const firstDay = new Date(currentYear, currentMonth-1, 1).getDay();
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
+    for (let ii=0; ii<offset; ii++) html += `<div class="day-cell inactive"></div>`;
+    for (let d=1; d<=daysInMonth; d++) {
+      const dateObj = new Date(currentYear, currentMonth-1, d);
+      const jourSem = dateObj.getDay() === 0 ? 7 : dateObj.getDay();
+      const isActif = joursActifs.includes(jourSem);
+      const dateKey = String(d).padStart(2,'0') + String(currentMonth).padStart(2,'0') + currentYear;
+      const isCoche = cases[dateKey] === true;
+      const isToday = today.getDate()===d && today.getMonth()+1===currentMonth && today.getFullYear()===currentYear;
+      if (!isActif) {
+        html += `<div class="day-cell inactive">${d}</div>`;
+      } else if (isCoche) {
+        html += `<div class="day-cell checked ${isToday?'today-marker':''}" style="background:${coul};border-color:${coul}" onclick="toggleCase('${k}','${dateKey}',true)">${d}</div>`;
+      } else {
+        html += `<div class="day-cell active ${isToday?'today-marker':''}" style="border-color:${coul}33" onclick="toggleCase('${k}','${dateKey}',false)">${d}</div>`;
+      }
+    }
+    html += `</div></div>`;
+  });
+  container.innerHTML = html || `<div class="empty">Aucune habitude à afficher</div>`;
+}
 
-    ' Barre fond
-    Dim barreFond As Shape
-    Set barreFond = ws.Shapes.AddShape(msoShapeRoundedRectangle, xProg, yBarre, lBarre, hBarre)
-    barreFond.Name = "Hab_barfond_" & ligneTarget
-    With barreFond
-        .Fill.ForeColor.RGB=RGB(40,55,80):.Line.Visible=msoFalse:.Adjustments.Item(1)=0.5
-    End With
+// ===== TOGGLE CASE =====
+window.toggleCase = async function(habKey, dateKey, wasCoche) {
+  if (!userId) return;
+  const newVal = !wasCoche;
+  await set(ref(db, `users/${userId}/cases/${habKey}/${dateKey}`), newVal);
+  showToast(newVal ? '✅ Coché !' : '○ Décoché');
+  recalcPct(habKey);
+};
 
-    ' Barre remplie
-    Dim barreRemplie As Shape
-    Set barreRemplie = ws.Shapes.AddShape(msoShapeRoundedRectangle, xProg, yBarre, 1, hBarre)
-    barreRemplie.Name = "Hab_barre_" & ligneTarget
-    With barreRemplie
-        .Fill.ForeColor.RGB=couleur:.Line.Visible=msoFalse:.Adjustments.Item(1)=0.5
-    End With
+async function recalcPct(habKey) {
+  if (!userData?.habitudes?.[habKey]) return;
+  const h = userData.habitudes[habKey];
+  const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  const cases = userData.cases?.[habKey] || {};
+  let totalA=0, totalC=0;
+  for (let d=1; d<=daysInMonth; d++) {
+    const dateObj = new Date(currentYear, currentMonth-1, d);
+    const jourSem = dateObj.getDay()===0 ? 7 : dateObj.getDay();
+    if (joursActifs.includes(jourSem)) {
+      totalA++;
+      const dk = String(d).padStart(2,'0') + String(currentMonth).padStart(2,'0') + currentYear;
+      if (cases[dk]) totalC++;
+    }
+  }
+  const pct = totalA>0 ? Math.round((totalC/totalA)*100) : 0;
+  await set(ref(db, `users/${userId}/habitudes/${habKey}/pct`), pct);
+  await set(ref(db, `users/${userId}/habitudes/${habKey}/streak`), totalC);
+}
 
-    ' Pct
-    Dim pctShape As Shape
-    Set pctShape = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, xPct, yPct, 34, hTexte)
-    pctShape.Name = "Hab_pct_" & ligneTarget
-    With pctShape
-        .Fill.Visible=msoFalse:.Line.Visible=msoFalse
-        With .TextFrame2
-            .MarginLeft=0:.MarginTop=0:.MarginBottom=0:.MarginRight=0
-            .VerticalAnchor=msoAnchorMiddle
-            With .TextRange
-                .Text="0%":.ParagraphFormat.Alignment=msoAlignCenter
-                With .Font
-                    .Fill.ForeColor.RGB=couleur
-                    .Size=tTexte:.Bold=msoTrue:.Name="Aptos Narrow"
-                End With
-            End With
-        End With
-    End With
+// ===== MODAL FAB =====
+window.ouvrirModal = function() {
+  document.getElementById('inp-nom').value = '';
+  // Reset freq
+  document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector('[data-freq="Quotidien"]').classList.add('selected');
+  freqSelectionnee = 'Quotidien';
+  // Reset couleur
+  document.querySelectorAll('.couleur-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector('[data-rang="0"]').classList.add('selected');
+  rangSelectionne = 0;
+  document.getElementById('modal-overlay').classList.add('show');
+};
 
-    ' Icone streak
-    Dim iconeStreak As Shape
-    Set iconeStreak = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, xIco, yCercle, dCercle, dCercle)
-    iconeStreak.Name = "Hab_ico_" & ligneTarget
-    With iconeStreak
-        .Fill.Visible=msoFalse:.Line.Visible=msoFalse
-        With .TextFrame2
-            .MarginLeft=0:.MarginTop=0:.MarginBottom=0:.MarginRight=0
-            .VerticalAnchor=msoAnchorMiddle
-            With .TextRange
-                .Text="J":.ParagraphFormat.Alignment=msoAlignCenter
-                With .Font
-                    .Fill.ForeColor.RGB=RGB(255,140,0)
-                    .Size=11:.Name="Wingdings 2"
-                End With
-            End With
-        End With
-    End With
+window.selFreq = function(btn) {
+  document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  freqSelectionnee = btn.getAttribute('data-freq');
+};
 
-    ' Streak
-    Dim streakShape As Shape
-    Set streakShape = ws.Shapes.AddTextbox(msoTextOrientationHorizontal, xStreak, yTexte, lStreak, hTexte)
-    streakShape.Name = "Hab_streak_" & ligneTarget
-    With streakShape
-        .Fill.Visible=msoFalse:.Line.Visible=msoFalse
-        With .TextFrame2
-            .MarginLeft=0:.MarginTop=0:.MarginBottom=0:.MarginRight=0
-            .VerticalAnchor=msoAnchorMiddle
-            With .TextRange
-                .Text="0 jours":.ParagraphFormat.Alignment=msoAlignLeft
-                With .Font
-                    .Fill.ForeColor.RGB=couleur
-                    .Size=tTexte:.Bold=msoTrue:.Name="Aptos Narrow"
-                End With
-            End With
-        End With
-    End With
+window.selCouleur = function(btn) {
+  document.querySelectorAll('.couleur-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  rangSelectionne = parseInt(btn.getAttribute('data-rang'));
+};
 
-    ' Cases a cocher
-    Call ConstruireCasesCocher(ws, ligneTarget, joursActifs, couleur)
-End Sub
+window.ajouterHabitude = async function() {
+  const nom = document.getElementById('inp-nom').value.trim();
+  if (!nom) { showToast('⚠️ Entrez un nom !'); return; }
+  if (!userId) { showToast('⚠️ Pas d\'identifiant !'); return; }
 
-Function JoursVersJSON(joursActifs() As Integer) As String
-    Dim json As String: json = "["
-    Dim i As Integer
-    For i = 0 To UBound(joursActifs)
-        If i > 0 Then json = json & ","
-        json = json & joursActifs(i)
-    Next i
-    json = json & "]"
-    JoursVersJSON = json
-End Function
+  // Vérifier max 6 habitudes
+  const nbActuel = userData?.habitudes ? Object.keys(userData.habitudes).length : 0;
+  if (nbActuel >= 6) { showToast('⚠️ Maximum 6 habitudes !'); return; }
 
-Function ExtraireChampJSON(json As String, champ As String) As String
-    Dim pattern As String: pattern = """" & champ & """:"
-    Dim pos As Long: pos = InStr(json, pattern)
-    If pos = 0 Then ExtraireChampJSON = "": Exit Function
-    pos = pos + Len(pattern)
-    Do While pos <= Len(json) And Mid(json, pos, 1) = " "
-        pos = pos + 1
-    Loop
-    If Mid(json, pos, 1) = """" Then
-        pos = pos + 1
-        Dim posEnd As Long: posEnd = InStr(pos, json, """")
-        If posEnd = 0 Then ExtraireChampJSON = "": Exit Function
-        ExtraireChampJSON = Mid(json, pos, posEnd - pos)
-    Else
-        Dim posEndNum As Long: posEndNum = pos
-        Do While posEndNum <= Len(json)
-            Dim c As String: c = Mid(json, posEndNum, 1)
-            If c = "," Or c = "}" Or c = " " Or c = "]" Then Exit Do
-            posEndNum = posEndNum + 1
-        Loop
-        ExtraireChampJSON = Mid(json, pos, posEndNum - pos)
-    End If
-End Function
-```
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Enregistrement...';
 
----
+  // Clé unique mobile
+  const rand = Math.random().toString(36).substring(2,6);
+  const cle = 'hab_mob_' + rand;
 
-**Résumé du flux complet :**
-```
-📱 Formulaire + → hab_mob_xxxx dans Firebase
-         ↓
-Excel clique SYNC
-         ↓
-ImporterHabitudesMobiles détecte hab_mob_xxxx
-         ↓
-Crée la forme Excel (nom + barre + cases)
-         ↓
-Renomme Firebase : hab_mob_xxxx → hab_0..5
-         ↓
-MsgBox "1 nouvelle habitude importée !"
+  const joursActifs = FREQ_JOURS[freqSelectionnee] || [1,2,3,4,5,6,7];
+
+  const habData = {
+    nom: nom,
+    frequence: freqSelectionnee,
+    joursActifs: joursActifs,
+    rang: rangSelectionne,
+    pct: 0,
+    streak: 0,
+    source: 'mobile',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await set(ref(db, `users/${userId}/habitudes/${cle}`), habData);
+    fermerModal();
+    showToast('✅ Habitude ajoutée ! Sync Excel pour la voir.');
+  } catch(e) {
+    showToast('❌ Erreur lors de l\'enregistrement.');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✅ AJOUTER L\'HABITUDE';
+};
+
+window.fermerModal = function() { document.getElementById('modal-overlay').classList.remove('show'); };
+window.fermerModalOverlay = function(e) { if (e.target===document.getElementById('modal-overlay')) fermerModal(); };
+
+window.changeMonth = function(dir) {
+  currentMonth += dir;
+  if (currentMonth>12){currentMonth=1;currentYear++;}
+  if (currentMonth<1){currentMonth=12;currentYear--;}
+  renderCalendrier();
+};
+
+window.showPage = function(page, event) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if (event?.target) event.target.classList.add('active');
+  if (page==='calendrier') renderCalendrier();
+};
+
+window.syncNow = function() {
+  showToast('↻ Synchronisation...');
+  if (userData) { renderHabitudes(); renderCalendrier(); showToast('✅ Synchronisé !'); }
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
