@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mes Événements</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #060d1f;
+    --bg2: #0b1530;
+    --bg3: #111f40;
+    --accent: #4f8ef7;
+    --gold: #f5c842;
+    --text: #e8f0ff;
+    --muted: #6a85b5;
+    --card: #0e1a38;
+    --border: #1e3060;
+    --green: #00c896;
+    --orange: #ff8c00;
+    --purple: #8a2be2;
+    --blue: #0078d7;
+    --pink: #ff4dac;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background particles */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(79,142,247,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0,200,150,0.05) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+
+  .wrapper { position:relative; z-index:1; max-width:480px; margin:0 auto; padding:0 0 40px; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0b1530 0%, #0e2050 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    position: sticky; top:0; z-index:100;
+    backdrop-filter: blur(10px);
+  }
+  .header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon { font-size:24px; }
+  .logo-text {
+    font-family:'Rajdhani', sans-serif;
+    font-size:20px; font-weight:700; letter-spacing:2px;
+  }
+  .logo-text span { color:var(--accent); }
+  .sync-btn {
+    background: linear-gradient(135deg, var(--accent), #2563c7);
+    border:none; color:#fff; padding:7px 16px; border-radius:20px;
+    font-family:'Nunito',sans-serif; font-size:13px; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; gap:6px;
+    transition: opacity .2s;
+  }
+  .sync-btn:hover { opacity:.85; }
+
+  /* TABS */
+  .tabs { display:flex; gap:10px; }
+  .tab {
+    flex:1; padding:9px; border-radius:10px; border:1px solid var(--border);
+    background:transparent; color:var(--muted); font-family:'Nunito',sans-serif;
+    font-size:13px; font-weight:700; cursor:pointer; display:flex;
+    align-items:center; justify-content:center; gap:6px; transition:.2s;
+    letter-spacing:.5px;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, rgba(79,142,247,0.2), rgba(79,142,247,0.05));
+    border-color: var(--accent); color:var(--text);
+  }
+
+  /* CONTENT PANELS */
+  .panel { display:none; padding:16px; }
+  .panel.active { display:block; }
+
+  /* SCORE CARD */
+  .score-card {
+    background: linear-gradient(135deg, var(--card), #0a1528);
+    border:1px solid var(--border); border-radius:16px;
+    padding:18px; margin-bottom:16px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .score-ring {
+    width:72px; height:72px; flex-shrink:0;
+    position:relative;
+  }
+  .score-ring svg { transform:rotate(-90deg); }
+  .score-ring-text {
+    position:absolute; inset:0; display:flex;
+    align-items:center; justify-content:center;
+    font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700;
+    color:var(--gold);
+  }
+  .score-info { flex:1; }
+  .score-label { font-size:11px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px; }
+  .score-month { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; color:var(--accent); }
+  .score-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size:11px; letter-spacing:2px; color:var(--muted);
+    text-transform:uppercase; margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-title::before { content:''; width:3px; height:14px; background:var(--accent); border-radius:2px; }
+
+  /* EVENT CARDS */
+  .event-list { display:flex; flex-direction:column; gap:10px; }
+  .event-card {
+    background: var(--card);
+    border:1px solid var(--border); border-radius:14px;
+    padding:14px 14px 14px 0;
+    display:flex; align-items:center; gap:0;
+    overflow:hidden; position:relative;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .event-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+  .event-band { width:5px; min-height:54px; border-radius:0 4px 4px 0; margin-right:12px; flex-shrink:0; }
+  .event-info { flex:1; min-width:0; }
+  .event-name {
+    font-weight:700; font-size:15px; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .event-meta { display:flex; align-items:center; gap:8px; margin-top:4px; }
+  .event-date { font-size:12px; color:var(--muted); }
+  .event-time {
+    font-size:11px; font-weight:700; color:var(--gold);
+    background:rgba(245,200,66,0.1); padding:2px 8px; border-radius:20px;
+  }
+  .event-badge {
+    width:36px; height:36px; border-radius:50%; flex-shrink:0; margin-right:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+  }
+  .empty-state {
+    text-align:center; padding:40px 20px; color:var(--muted);
+  }
+  .empty-state .icon { font-size:48px; margin-bottom:12px; }
+  .empty-state p { font-size:14px; }
+
+  /* CALENDAR */
+  .cal-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .cal-nav {
+    background:var(--card); border:1px solid var(--border);
+    color:var(--text); width:34px; height:34px; border-radius:50%;
+    font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:.2s;
+  }
+  .cal-nav:hover { background:var(--bg3); border-color:var(--accent); }
+  .cal-month-label {
+    font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700;
+    color:var(--text); letter-spacing:1px;
+  }
+  .cal-grid-header {
+    display:grid; grid-template-columns:repeat(7,1fr);
+    text-align:center; margin-bottom:6px;
+  }
+  .cal-grid-header span { font-size:11px; color:var(--muted); font-weight:700; padding:4px 0; }
+  .cal-grid {
+    display:grid; grid-template-columns:repeat(7,1fr); gap:3px;
+  }
+  .cal-day {
+    aspect-ratio:1; border-radius:8px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; position:relative;
+    font-size:12px; font-weight:600; color:var(--muted);
+    cursor:default; transition:.15s;
+  }
+  .cal-day.current-month { color:var(--text); }
+  .cal-day.today {
+    background:rgba(79,142,247,0.15); border:1px solid var(--accent);
+    color:var(--accent); font-weight:700;
+  }
+  .cal-day.has-event { cursor:pointer; }
+  .cal-day.has-event:hover { background:rgba(255,255,255,0.05); }
+  .cal-dots {
+    display:flex; gap:2px; position:absolute; bottom:3px;
+  }
+  .cal-dot {
+    width:5px; height:5px; border-radius:50%;
+  }
+  .cal-day-num { line-height:1; }
+
+  /* EVENT POPUP */
+  .popup-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.7); z-index:200;
+    align-items:center; justify-content:center;
+    backdrop-filter:blur(4px);
+  }
+  .popup-overlay.show { display:flex; }
+  .popup {
+    background: var(--bg2); border:1px solid var(--border);
+    border-radius:20px; padding:24px; width:90%; max-width:340px;
+    animation: popIn .2s ease;
+  }
+  @keyframes popIn { from { transform:scale(.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .popup-title {
+    font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700;
+    color:var(--gold); margin-bottom:16px; letter-spacing:1px;
+  }
+  .popup-events { display:flex; flex-direction:column; gap:10px; }
+  .popup-event {
+    background:var(--card); border-radius:12px; padding:12px;
+    border-left:4px solid;
+  }
+  .popup-event-name { font-weight:700; font-size:15px; margin-bottom:4px; }
+  .popup-event-time { font-size:12px; color:var(--gold); }
+  .popup-close {
+    width:100%; margin-top:16px; padding:10px; border-radius:10px;
+    background:var(--bg3); border:1px solid var(--border);
+    color:var(--muted); font-family:'Nunito',sans-serif; font-size:14px;
+    cursor:pointer; transition:.2s;
+  }
+  .popup-close:hover { border-color:var(--accent); color:var(--text); }
+
+  /* LOADING */
+  .loading {
+    display:flex; align-items:center; justify-content:center;
+    padding:40px; gap:12px; color:var(--muted); font-size:14px;
+  }
+  .spinner {
+    width:20px; height:20px; border:2px solid var(--border);
+    border-top-color:var(--accent); border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* TOAST */
+  .toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:var(--bg3); border:1px solid var(--border);
+    color:var(--text); padding:10px 20px; border-radius:20px;
+    font-size:13px; font-weight:600; z-index:300;
+    transition: transform .3s ease;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <header>
+    <div class="header-top">
+      <div class="logo">
+        <span class="logo-icon">📅</span>
+        <div class="logo-text">MES <span>ÉVÉNEMENTS</span></div>
+      </div>
+      <button class="sync-btn" onclick="chargerEvenements()">
+        <span>↻</span> SYNC
+      </button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="changerOnglet('liste', this)">📋 LISTE</button>
+      <button class="tab" onclick="changerOnglet('calendrier', this)">🗓 CALENDRIER</button>
+    </div>
+  </header>
+
+  <!-- PANEL LISTE -->
+  <div class="panel active" id="panel-liste">
+
+    <div style="height:16px;"></div>
+
+    <!-- Score card -->
+    <div class="score-card">
+      <div class="score-ring">
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="30" fill="none" stroke="#1e3060" stroke-width="6"/>
+          <circle id="ring-progress" cx="36" cy="36" r="30" fill="none"
+            stroke="#f5c842" stroke-width="6" stroke-linecap="round"
+            stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+        </svg>
+        <div class="score-ring-text" id="ring-pct">0</div>
+      </div>
+      <div class="score-info">
+        <div class="score-label">Ce mois</div>
+        <div class="score-month" id="score-month">—</div>
+        <div class="score-sub" id="score-sub">Chargement...</div>
+      </div>
+    </div>
+
+    <div class="section-title">Tous les événements</div>
+    <div class="event-list" id="event-list">
+      <div class="loading"><div class="spinner"></div> Chargement...</div>
+    </div>
+  </div>
+
+  <!-- PANEL CALENDRIER -->
+  <div class="panel" id="panel-calendrier">
+    <div style="height:16px;"></div>
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changerMois(-1)">‹</button>
+      <div class="cal-month-label" id="cal-label">—</div>
+      <button class="cal-nav" onclick="changerMois(1)">›</button>
+    </div>
+    <div class="cal-grid-header">
+      <span>Lun</span><span>Mar</span><span>Mer</span>
+      <span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+</div>
+
+<!-- POPUP JOUR -->
+<div class="popup-overlay" id="popup-overlay" onclick="fermerPopup(event)">
+  <div class="popup">
+    <div class="popup-title" id="popup-date-title">Événements du jour</div>
+    <div class="popup-events" id="popup-events"></div>
+    <button class="popup-close" onclick="fermerPopup()">Fermer</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FIREBASE_URL = "https://mes-habitudes-c22ce-default-rtdb.firebaseio.com";
+const MOIS_FR = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const MOIS_FR_COURT = ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Aoû","Sep","Oct","Nov","Déc"];
+const COULEURS_TYPE = {
+  "travail": "#ff8c00",
+  "perso": "#8a2be2",
+  "etude": "#0078d7",
+  "loisir": "#00b464",
+  "default": "#4f8ef7"
+};
+const EMOJIS = { "#ff8c00":"💼","#8a2be2":"🏠","#0078d7":"📚","#00b464":"🎮","#4f8ef7":"📅" };
+
+let userId = "";
+let evenements = {};
+let calDate = new Date();
+
+// Lire uid depuis URL
+function lireUID() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("uid") || "";
+}
+
+// Convertir couleur RGB long VBA → hex
+function longVersHex(val) {
+  if (!val) return "#4f8ef7";
+  const n = parseInt(val);
+  const r = n & 0xFF;
+  const g = (n >> 8) & 0xFF;
+  const b = (n >> 16) & 0xFF;
+  return "#" + [r,g,b].map(x => x.toString(16).padStart(2,"0")).join("");
+}
+
+// Formater date ddmmyyyy → objet Date
+function parseDateKey(dk) {
+  if (!dk || dk.length !== 8) return null;
+  const d = parseInt(dk.substring(0,2));
+  const m = parseInt(dk.substring(2,4)) - 1;
+  const y = parseInt(dk.substring(4,8));
+  return new Date(y, m, d);
+}
+
+// Formater date pour affichage
+function formatDateAff(dk) {
+  const dt = parseDateKey(dk);
+  if (!dt) return dk;
+  return dt.getDate() + " " + MOIS_FR[dt.getMonth()] + " " + dt.getFullYear();
+}
+
+async function chargerEvenements() {
+  userId = lireUID();
+  if (!userId) {
+    afficherErreur("Aucun identifiant trouvé dans l'URL.");
+    return;
+  }
+  afficherChargement();
+  try {
+    const url = `${FIREBASE_URL}/users/${userId}/evenements.json`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    evenements = data || {};
+    afficherListe();
+    dessinerCalendrier();
+    afficherToast("✅ Synchronisé !");
+  } catch(e) {
+    afficherErreur("Impossible de charger les données Firebase.");
+  }
+}
+
+function afficherChargement() {
+  document.getElementById("event-list").innerHTML =
+    `<div class="loading"><div class="spinner"></div> Chargement...</div>`;
+}
+
+function afficherErreur(msg) {
+  document.getElementById("event-list").innerHTML =
+    `<div class="empty-state"><div class="icon">⚠️</div><p>${msg}</p></div>`;
+}
+
+function afficherListe() {
+  const container = document.getElementById("event-list");
+  const keys = Object.keys(evenements);
+
+  // Stats mois actuel
+  const now = new Date();
+  const moisActuel = now.getMonth();
+  const anneeActuelle = now.getFullYear();
+  let countMois = 0;
+  let countTotal = keys.length;
+
+  // Trier par date
+  const tries = keys.map(k => {
+    const evt = evenements[k];
+    const dt = parseDateKey(evt.date);
+    return { key:k, ...evt, dt };
+  }).filter(e => e.dt).sort((a,b) => a.dt - b.dt);
+
+  tries.forEach(e => {
+    if (e.dt && e.dt.getMonth() === moisActuel && e.dt.getFullYear() === anneeActuelle) countMois++;
+  });
+
+  // Score ring — nb événements ce mois (anneau, max visuel = 10)
+  const circ = 188.5;
+  const maxVisuel = 10;
+  const offset = countMois === 0 ? circ : circ - (circ * Math.min(countMois, maxVisuel) / maxVisuel);
+  document.getElementById("ring-progress").style.strokeDashoffset = offset;
+  document.getElementById("ring-pct").textContent = countMois;
+  document.getElementById("score-month").textContent = MOIS_FR[moisActuel] + " " + anneeActuelle;
+  document.getElementById("score-sub").textContent = countTotal + " événement(s) au total";
+
+  if (tries.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Aucun événement trouvé</p></div>`;
+    return;
+  }
+
+  container.innerHTML = "";
+  tries.forEach(evt => {
+    const coulHex = longVersHex(evt.couleur);
+    const emoji = EMOJIS[coulHex] || "📅";
+    const dateAff = formatDateAff(evt.date);
+    const heureHtml = evt.heure ? `<span class="event-time">⏰ ${evt.heure}</span>` : "";
+
+    // Passé ou futur ?
+    const isPast = evt.dt < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const opacity = isPast ? "opacity:.6;" : "";
+
+    const card = document.createElement("div");
+    card.className = "event-card";
+    card.style = opacity;
+    card.innerHTML = `
+      <div class="event-band" style="background:${coulHex};"></div>
+      <div class="event-info">
+        <div class="event-name">${evt.nom || "—"}</div>
+        <div class="event-meta">
+          <span class="event-date">📆 ${dateAff}</span>
+          ${heureHtml}
+        </div>
+      </div>
+      <div class="event-badge" style="background:${coulHex}22;">${emoji}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ===== CALENDRIER =====
+
+function dessinerCalendrier() {
+  const y = calDate.getFullYear();
+  const m = calDate.getMonth();
+  document.getElementById("cal-label").textContent = MOIS_FR[m] + " " + y;
+
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+
+  // Premier jour du mois (lundi = 0)
+  const premier = new Date(y, m, 1);
+  let startDow = premier.getDay(); // 0=dim
+  startDow = startDow === 0 ? 6 : startDow - 1; // convertir lun=0
+
+  const dernier = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+
+  // Map date → événements
+  const evtMap = {};
+  Object.values(evenements).forEach(evt => {
+    if (!evt.date || evt.date.length !== 8) return;
+    const em = parseInt(evt.date.substring(2,4)) - 1;
+    const ey = parseInt(evt.date.substring(4,8));
+    if (em !== m || ey !== y) return;
+    const ed = parseInt(evt.date.substring(0,2));
+    if (!evtMap[ed]) evtMap[ed] = [];
+    evtMap[ed].push(evt);
+  });
+
+  // Cases vides avant
+  for (let i=0; i<startDow; i++) {
+    const empty = document.createElement("div");
+    empty.className = "cal-day";
+    grid.appendChild(empty);
+  }
+
+  for (let d=1; d<=dernier; d++) {
+    const cell = document.createElement("div");
+    cell.className = "cal-day current-month";
+
+    const isToday = (d === today.getDate() && m === today.getMonth() && y === today.getFullYear());
+    if (isToday) cell.classList.add("today");
+
+    const evts = evtMap[d] || [];
+    if (evts.length > 0) {
+      cell.classList.add("has-event");
+      cell.onclick = () => ouvrirPopup(d, m, y, evts);
+    }
+
+    let dotsHtml = "";
+    evts.slice(0,3).forEach(evt => {
+      const c = longVersHex(evt.couleur);
+      dotsHtml += `<div class="cal-dot" style="background:${c};"></div>`;
+    });
+
+    cell.innerHTML = `
+      <div class="cal-day-num">${d}</div>
+      ${dotsHtml ? `<div class="cal-dots">${dotsHtml}</div>` : ""}
+    `;
+    grid.appendChild(cell);
+  }
+}
+
+function changerMois(delta) {
+  calDate.setMonth(calDate.getMonth() + delta);
+  dessinerCalendrier();
+}
+
+function ouvrirPopup(d, m, y, evts) {
+  document.getElementById("popup-date-title").textContent =
+    d + " " + MOIS_FR[m] + " " + y;
+
+  const container = document.getElementById("popup-events");
+  container.innerHTML = "";
+  evts.forEach(evt => {
+    const c = longVersHex(evt.couleur);
+    const div = document.createElement("div");
+    div.className = "popup-event";
+    div.style.borderColor = c;
+    div.innerHTML = `
+      <div class="popup-event-name" style="color:${c};">${evt.nom || "—"}</div>
+      ${evt.heure ? `<div class="popup-event-time">⏰ ${evt.heure}</div>` : ""}
+    `;
+    container.appendChild(div);
+  });
+
+  document.getElementById("popup-overlay").classList.add("show");
+}
+
+function fermerPopup(e) {
+  if (!e || e.target === document.getElementById("popup-overlay") || !e.target) {
+    document.getElementById("popup-overlay").classList.remove("show");
+  }
+}
+
+function changerOnglet(nom, btn) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("panel-" + nom).classList.add("active");
+  btn.classList.add("active");
+  if (nom === "calendrier") dessinerCalendrier();
+}
+
+function afficherToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// Init
+window.onload = chargerEvenements;
+</script>
+</body>
+</html>
