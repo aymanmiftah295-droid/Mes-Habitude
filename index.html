@@ -33,9 +33,9 @@
     font-family: 'Exo 2', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-bottom: 110px;
   }
 
-  /* HEADER */
   .header {
     background: linear-gradient(135deg, #060d1a 0%, #0a1628 100%);
     border-bottom: 1px solid var(--border);
@@ -99,11 +99,9 @@
     color: var(--accent);
   }
 
-  /* PAGES */
   .page { display: none; padding: 12px; }
   .page.active { display: block; }
 
-  /* SECTION TITLE */
   .section-title {
     font-family: 'Rajdhani', sans-serif;
     font-size: 13px;
@@ -112,12 +110,10 @@
     color: var(--text2);
     text-transform: uppercase;
     margin: 16px 0 8px;
-    padding-left: 4px;
     border-left: 3px solid var(--accent);
     padding-left: 8px;
   }
 
-  /* HABITUDES */
   .hab-card {
     background: var(--bg2);
     border: 1px solid var(--border);
@@ -126,13 +122,6 @@
     margin-bottom: 8px;
     position: relative;
     overflow: hidden;
-  }
-  .hab-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    border-radius: 3px 0 0 3px;
   }
   .hab-header {
     display: flex;
@@ -175,7 +164,6 @@
   }
   .hab-streak span { color: var(--orange); font-weight: 600; }
 
-  /* SCORE GLOBAL */
   .score-card {
     background: linear-gradient(135deg, var(--bg2), var(--bg3));
     border: 1px solid var(--border);
@@ -223,7 +211,6 @@
     margin-top: 2px;
   }
 
-  /* CALENDRIER */
   .cal-header {
     display: flex;
     align-items: center;
@@ -269,13 +256,8 @@
     align-items: center;
     gap: 8px;
   }
-  .cal-hab-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+  .cal-hab-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-  /* GRILLE JOURS */
   .days-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -322,10 +304,7 @@
     color: rgba(160,210,255,0.7);
   }
   .day-cell.active:active { transform: scale(0.9); }
-  .day-cell.checked {
-    color: white;
-    font-weight: 700;
-  }
+  .day-cell.checked { color: white; font-weight: 700; }
   .day-cell.today-marker::after {
     content: '';
     position: absolute;
@@ -337,7 +316,6 @@
     background: var(--accent);
   }
 
-  /* LOADING */
   .loading {
     display: flex;
     flex-direction: column;
@@ -346,10 +324,7 @@
     min-height: 60vh;
     gap: 16px;
   }
-  .loading-icon {
-    font-size: 40px;
-    animation: pulse 1.5s ease-in-out infinite;
-  }
+  .loading-icon { font-size: 40px; animation: pulse 1.5s ease-in-out infinite; }
   .loading-text {
     font-family: 'Rajdhani', sans-serif;
     font-size: 14px;
@@ -362,7 +337,6 @@
     50% { opacity: 0.5; transform: scale(0.95); }
   }
 
-  /* EMPTY */
   .empty {
     text-align: center;
     padding: 40px 20px;
@@ -371,10 +345,148 @@
     letter-spacing: 1px;
   }
 
+  /* ===== FAB ===== */
+  .fab {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #0078a8);
+    border: none;
+    color: var(--bg);
+    font-size: 32px;
+    cursor: pointer;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 28px rgba(0,200,255,0.5);
+    transition: transform .2s, box-shadow .2s;
+    font-weight: 700;
+  }
+  .fab:active { transform: translateX(-50%) scale(0.92); }
+
+  /* ===== MODAL COCHER ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 44px;
+    width: 100%;
+    max-width: 480px;
+    animation: slideUp .3s ease;
+  }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+  .modal-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-subtitle {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+  .modal-close-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Liste habitudes dans modal */
+  .hab-check-list { display: flex; flex-direction: column; gap: 10px; }
+  .hab-check-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .hab-check-item:active { transform: scale(0.98); }
+  .hab-check-item.checked {
+    border-width: 2px;
+  }
+  .hab-check-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hab-check-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .hab-check-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .hab-check-status {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .hab-check-item.checked .hab-check-status {
+    color: white;
+  }
+
+  .modal-date-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    color: var(--text2);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
   /* TOAST */
   .toast {
     position: fixed;
-    bottom: 20px;
+    bottom: 110px;
     left: 50%;
     transform: translateX(-50%) translateY(80px);
     background: var(--bg3);
@@ -392,7 +504,6 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* SCROLLBAR */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -406,8 +517,8 @@
     <button class="sync-btn" onclick="syncNow()">↻ SYNC</button>
   </div>
   <div class="tabs">
-    <div class="tab active" onclick="showPage('habitudes')">📊 HABITUDES</div>
-    <div class="tab" onclick="showPage('calendrier')">📅 CALENDRIER</div>
+    <div class="tab active" onclick="showPage('habitudes', event)">📊 HABITUDES</div>
+    <div class="tab" onclick="showPage('calendrier', event)">📅 CALENDRIER</div>
   </div>
 </div>
 
@@ -434,9 +545,25 @@
   </div>
 </div>
 
+<!-- FAB + -->
+<button class="fab" onclick="ouvrirModal()">+</button>
+
+<!-- MODAL COCHER HABITUDES -->
+<div class="modal-overlay" id="modal-overlay" onclick="fermerModalOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">
+      ✅ MES HABITUDES
+      <button class="modal-close-btn" onclick="fermerModal()">✕</button>
+    </div>
+    <div class="modal-date-label" id="modal-date-label">—</div>
+    <div class="hab-check-list" id="hab-check-list">
+      <div class="loading"><div class="loading-icon" style="font-size:24px">🔥</div></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -454,7 +581,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Récupérer userId depuis URL
 const params = new URLSearchParams(window.location.search);
 const userId = params.get('uid');
 
@@ -463,19 +589,19 @@ let currentMonth = new Date().getMonth() + 1;
 let currentYear = new Date().getFullYear();
 
 const COULEURS = {
-  0: '#00dc82',
-  1: '#ff6464',
-  2: '#6496ff',
-  3: '#ffb400',
-  4: '#c864ff',
-  5: '#ff64c8'
+  0: '#00dc82', 1: '#ff6464', 2: '#6496ff',
+  3: '#ffb400', 4: '#c864ff', 5: '#ff64c8'
 };
 
+const MOIS_FR = ['','Janvier','Février','Mars','Avril','Mai','Juin',
+  'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+const JOURS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
 if (!userId) {
-  document.getElementById('habitudes-content').innerHTML = `
-    <div class="empty">❌ QR Code invalide<br><br>Régénère le QR Code depuis Excel</div>`;
+  document.getElementById('habitudes-content').innerHTML =
+    `<div class="empty">❌ QR Code invalide<br><br>Régénère le QR Code depuis Excel</div>`;
 } else {
-  // Écoute temps réel
   const userRef = ref(db, 'users/' + userId);
   onValue(userRef, (snapshot) => {
     userData = snapshot.val();
@@ -484,27 +610,19 @@ if (!userId) {
   });
 }
 
+// ===== RENDER HABITUDES =====
 function renderHabitudes() {
   const container = document.getElementById('habitudes-content');
   if (!userData || !userData.habitudes) {
     container.innerHTML = `<div class="empty">Aucune habitude trouvée<br><br>Synchronise depuis Excel d'abord</div>`;
     return;
   }
-
   const habs = userData.habitudes;
   const keys = Object.keys(habs);
-  
-  // Score global
-  let totalPct = 0;
-  let nb = 0;
-  keys.forEach(k => {
-    if (habs[k].pct !== undefined) { totalPct += habs[k].pct; nb++; }
-  });
+  let totalPct = 0, nb = 0;
+  keys.forEach(k => { if (habs[k].pct !== undefined) { totalPct += habs[k].pct; nb++; } });
   const moyenne = nb > 0 ? Math.round(totalPct / nb) : 0;
-  
   let coulScore = moyenne < 26 ? '#ff3c3c' : moyenne < 51 ? '#ffa000' : moyenne < 76 ? '#ffdc00' : '#00dc82';
-  
-  const monthNames = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
   let html = `
     <div class="score-card">
@@ -513,7 +631,7 @@ function renderHabitudes() {
       </div>
       <div class="score-info">
         <div class="score-label">Score de focus</div>
-        <div class="score-month">${monthNames[currentMonth]} ${currentYear}</div>
+        <div class="score-month">${MOIS_FR[currentMonth]} ${currentYear}</div>
         <div class="score-sub">${nb} habitude${nb>1?'s':''} suivie${nb>1?'s':''}</div>
       </div>
     </div>
@@ -525,12 +643,21 @@ function renderHabitudes() {
     const coul = COULEURS[i % 6];
     const pct = h.pct || 0;
     const streak = h.streak || 0;
+    // Verifier si cochee aujourd'hui
+    const today = new Date();
+    const todayKey = String(today.getDate()).padStart(2,'0') +
+      String(today.getMonth()+1).padStart(2,'0') + today.getFullYear();
+    const isTodayCoche = userData.cases && userData.cases[k] && userData.cases[k][todayKey] === true;
+
     html += `
-      <div class="hab-card" style="border-left-color:${coul}">
+      <div class="hab-card" style="border-color:${coul}33">
         <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${coul};border-radius:3px 0 0 3px"></div>
         <div class="hab-header">
           <div class="hab-name" style="color:${coul}">${h.nom || k}</div>
-          <div class="hab-pct" style="color:${coul}">${pct}%</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${isTodayCoche ? `<span style="font-size:11px;color:${coul};background:${coul}22;padding:2px 8px;border-radius:10px;font-weight:700">✓ Aujourd'hui</span>` : ''}
+            <div class="hab-pct" style="color:${coul}">${pct}%</div>
+          </div>
         </div>
         <div class="hab-freq">${h.frequence || ''}</div>
         <div class="hab-bar-bg">
@@ -540,26 +667,22 @@ function renderHabitudes() {
       </div>
     `;
   });
-
   container.innerHTML = html;
 }
 
+// ===== RENDER CALENDRIER =====
 function renderCalendrier() {
   const container = document.getElementById('calendrier-content');
-  const monthNames = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-  document.getElementById('cal-month-title').textContent = monthNames[currentMonth] + ' ' + currentYear;
-  
+  document.getElementById('cal-month-title').textContent = MOIS_FR[currentMonth] + ' ' + currentYear;
   if (!userData || !userData.habitudes) {
     container.innerHTML = `<div class="empty">Synchronise depuis Excel d'abord</div>`;
     return;
   }
-
   const habs = userData.habitudes;
   const keys = Object.keys(habs);
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
   const today = new Date();
   const dayNames = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
-
   let html = '';
 
   keys.forEach((k, i) => {
@@ -567,7 +690,6 @@ function renderCalendrier() {
     const coul = COULEURS[i % 6];
     const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
     const cases = (userData.cases && userData.cases[k]) ? userData.cases[k] : {};
-
     html += `
       <div class="cal-hab-section">
         <div class="cal-hab-title">
@@ -579,51 +701,44 @@ function renderCalendrier() {
         </div>
         <div class="days-grid">
     `;
-
-    // Premier jour du mois (0=dim, 1=lun...)
     const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
     const offset = firstDay === 0 ? 6 : firstDay - 1;
-
-    // Cellules vides avant le 1er
-    for (let i = 0; i < offset; i++) {
-      html += `<div class="day-cell inactive"></div>`;
-    }
-
+    for (let ii = 0; ii < offset; ii++) html += `<div class="day-cell inactive"></div>`;
     for (let d = 1; d <= daysInMonth; d++) {
       const dateObj = new Date(currentYear, currentMonth - 1, d);
-      const jourSem = dateObj.getDay() === 0 ? 7 : dateObj.getDay(); // 1=lun, 7=dim
+      const jourSem = dateObj.getDay() === 0 ? 7 : dateObj.getDay();
       const isActif = joursActifs.includes(jourSem);
       const dateKey = String(d).padStart(2,'0') + String(currentMonth).padStart(2,'0') + currentYear;
       const isCoche = cases[dateKey] === true;
-      const isToday = today.getDate() === d && today.getMonth()+1 === currentMonth && today.getFullYear() === currentYear;
-
+      const isToday = today.getDate()===d && today.getMonth()+1===currentMonth && today.getFullYear()===currentYear;
       if (!isActif) {
         html += `<div class="day-cell inactive">${d}</div>`;
       } else if (isCoche) {
-        html += `<div class="day-cell checked ${isToday?'today-marker':''}" 
-          style="background:${coul};border-color:${coul}" 
+        html += `<div class="day-cell checked ${isToday?'today-marker':''}"
+          style="background:${coul};border-color:${coul}"
           onclick="toggleCase('${k}','${dateKey}',true,'${coul}')">${d}</div>`;
       } else {
-        html += `<div class="day-cell active ${isToday?'today-marker':''}" 
-          style="border-color:${coul}33" 
+        html += `<div class="day-cell active ${isToday?'today-marker':''}"
+          style="border-color:${coul}33"
           onclick="toggleCase('${k}','${dateKey}',false,'${coul}')">${d}</div>`;
       }
     }
-
     html += `</div></div>`;
   });
-
   container.innerHTML = html || `<div class="empty">Aucune habitude à afficher</div>`;
 }
 
+// ===== TOGGLE CASE =====
 window.toggleCase = async function(habKey, dateKey, wasCoche, coul) {
   if (!userId) return;
   const newVal = !wasCoche;
-  const path = `users/${userId}/cases/${habKey}/${dateKey}`;
-  await set(ref(db, path), newVal);
+  await set(ref(db, `users/${userId}/cases/${habKey}/${dateKey}`), newVal);
   showToast(newVal ? '✅ Coché !' : '○ Décoché');
-  // Recalculer pct
   recalcPct(habKey);
+  // Rafraichir badge modal si ouvert
+  if (document.getElementById('modal-overlay').classList.contains('show')) {
+    refreshModalItems();
+  }
 };
 
 async function recalcPct(habKey) {
@@ -632,7 +747,6 @@ async function recalcPct(habKey) {
   const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
   const cases = (userData.cases && userData.cases[habKey]) ? userData.cases[habKey] : {};
-
   let totalA = 0, totalC = 0;
   for (let d = 1; d <= daysInMonth; d++) {
     const dateObj = new Date(currentYear, currentMonth - 1, d);
@@ -648,6 +762,71 @@ async function recalcPct(habKey) {
   await set(ref(db, `users/${userId}/habitudes/${habKey}/streak`), totalC);
 }
 
+// ===== MODAL FAB =====
+window.ouvrirModal = function() {
+  if (!userData || !userData.habitudes) {
+    showToast('⚠️ Synchronise d\'abord depuis Excel');
+    return;
+  }
+  // Afficher date du jour
+  const today = new Date();
+  const jourNom = JOURS_FR[today.getDay()];
+  const label = jourNom + ' ' + today.getDate() + ' ' + MOIS_FR[today.getMonth()+1] + ' ' + today.getFullYear();
+  document.getElementById('modal-date-label').textContent = label;
+  refreshModalItems();
+  document.getElementById('modal-overlay').classList.add('show');
+};
+
+function refreshModalItems() {
+  if (!userData || !userData.habitudes) return;
+  const today = new Date();
+  const todayKey = String(today.getDate()).padStart(2,'0') +
+    String(today.getMonth()+1).padStart(2,'0') + today.getFullYear();
+  const habs = userData.habitudes;
+  const keys = Object.keys(habs);
+  const container = document.getElementById('hab-check-list');
+  container.innerHTML = '';
+
+  keys.forEach((k, i) => {
+    const h = habs[k];
+    const coul = COULEURS[i % 6];
+    const isCoche = userData.cases && userData.cases[k] && userData.cases[k][todayKey] === true;
+
+    const item = document.createElement('div');
+    item.className = 'hab-check-item' + (isCoche ? ' checked' : '');
+    item.style.borderColor = isCoche ? coul : 'rgba(0,200,255,0.15)';
+    item.style.background = isCoche ? `${coul}15` : 'var(--bg3)';
+    item.innerHTML = `
+      <div class="hab-check-left">
+        <div class="hab-check-dot" style="background:${coul}"></div>
+        <div class="hab-check-name" style="color:${coul}">${h.nom || k}</div>
+      </div>
+      <div class="hab-check-status" style="border-color:${coul};background:${isCoche?coul:'transparent'};color:${isCoche?'white':coul}">
+        ${isCoche ? '✓' : ''}
+      </div>
+    `;
+    item.onclick = () => toggleCaseModal(k, todayKey, isCoche, coul);
+    container.appendChild(item);
+  });
+}
+
+async function toggleCaseModal(habKey, dateKey, wasCoche, coul) {
+  if (!userId) return;
+  const newVal = !wasCoche;
+  await set(ref(db, `users/${userId}/cases/${habKey}/${dateKey}`), newVal);
+  showToast(newVal ? '✅ Coché !' : '○ Décoché');
+  recalcPct(habKey);
+  refreshModalItems();
+}
+
+window.fermerModal = function() {
+  document.getElementById('modal-overlay').classList.remove('show');
+};
+window.fermerModalOverlay = function(e) {
+  if (e.target === document.getElementById('modal-overlay')) fermerModal();
+};
+
+// ===== NAVIGATION =====
 window.changeMonth = function(dir) {
   currentMonth += dir;
   if (currentMonth > 12) { currentMonth = 1; currentYear++; }
@@ -655,11 +834,12 @@ window.changeMonth = function(dir) {
   renderCalendrier();
 };
 
-window.showPage = function(page) {
+window.showPage = function(page, event) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
-  event.target.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+  if (page === 'calendrier') renderCalendrier();
 };
 
 window.syncNow = function() {
@@ -671,8 +851,9 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 </script>
 </body>
 </html>
+
