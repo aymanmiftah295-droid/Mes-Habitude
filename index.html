@@ -39,6 +39,11 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-h
 /* Delete button on habit card */
 .hab-delete-btn{background:rgba(255,60,60,.12);border:1px solid rgba(255,60,60,.3);color:#ff6060;font-size:14px;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;margin-left:6px;}
 .hab-delete-btn:active{background:rgba(255,60,60,.35);transform:scale(.9);}
+.hab-edit-btn{background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.3);color:var(--accent);font-size:14px;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;margin-left:6px;}
+.hab-edit-btn:active{background:rgba(0,200,255,.3);transform:scale(.9);}
+/* EDIT MODAL */
+.edit-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);}
+.edit-overlay.show{display:flex;}
 .score-card{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;}
 .score-circle{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid;}
 .score-circle-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
@@ -198,6 +203,45 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-h
     </div>
     <button class="submit-btn" id="submit-btn" onclick="ajouterHabitude()">
       ✅ ADD HABIT
+    </button>
+  </div>
+</div>
+ 
+<!-- EDIT HABIT MODAL -->
+<div class="edit-overlay" id="edit-overlay" onclick="fermerEditOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">
+      ✏️ EDIT HABIT
+      <button class="modal-close-btn" onclick="fermerEdit()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Habit Name</label>
+      <input class="form-input" id="edit-nom" type="text" placeholder="Habit name..."/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Frequency</label>
+      <div class="freq-grid">
+        <button class="freq-btn" data-freq="Daily" onclick="selEditFreq(this)">📅 Daily</button>
+        <button class="freq-btn" data-freq="Mon, Wed, Fri" onclick="selEditFreq(this)">📆 Mon, Wed, Fri</button>
+        <button class="freq-btn" data-freq="Tue, Thu, Sat" onclick="selEditFreq(this)">📆 Tue, Thu, Sat</button>
+        <button class="freq-btn" data-freq="Weekly" onclick="selEditFreq(this)">🗓 Weekly</button>
+        <button class="freq-btn" data-freq="Custom" onclick="selEditFreq(this)" style="grid-column:span 2">⚙️ Custom...</button>
+      </div>
+      <div class="custom-days-panel" id="edit-custom-days-panel">
+        <div class="custom-days-label">Select active days</div>
+        <div class="day-toggle-grid">
+          <button class="day-toggle" data-day="1" onclick="toggleEditDay(this)">Mo</button>
+          <button class="day-toggle" data-day="2" onclick="toggleEditDay(this)">Tu</button>
+          <button class="day-toggle" data-day="3" onclick="toggleEditDay(this)">We</button>
+          <button class="day-toggle" data-day="4" onclick="toggleEditDay(this)">Th</button>
+          <button class="day-toggle" data-day="5" onclick="toggleEditDay(this)">Fr</button>
+          <button class="day-toggle" data-day="6" onclick="toggleEditDay(this)">Sa</button>
+          <button class="day-toggle" data-day="7" onclick="toggleEditDay(this)">Su</button>
+        </div>
+      </div>
+    </div>
+    <button class="submit-btn" id="edit-submit-btn" onclick="sauvegarderEdit()">
+      💾 SAVE CHANGES
     </button>
   </div>
 </div>
@@ -593,6 +637,121 @@ window.showPage = function(page, event) {
 window.syncNow = function() {
   showToast('↻ Syncing...');
   if (userData) { renderHabitudes(); renderCalendrier(); showToast('✅ Synced!'); }
+};
+ 
+// ===== EDIT HABIT =====
+let editKey = null;
+let editFreqSelected = 'Daily';
+let editCustomDays = [];
+ 
+window.ouvrirEdit = function(key, nom, freq) {
+  editKey = key;
+  editFreqSelected = freq;
+  editCustomDays = [];
+ 
+  document.getElementById('edit-nom').value = nom;
+ 
+  // Reset freq buttons
+  document.querySelectorAll('#edit-overlay .freq-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('edit-custom-days-panel').classList.remove('show');
+  document.querySelectorAll('#edit-overlay .day-toggle').forEach(b => b.classList.remove('on'));
+ 
+  // Pre-select current frequency
+  const FREQ_MAP = {
+    'Daily':'Daily','Quotidien':'Daily',
+    'Mon, Wed, Fri':'Mon, Wed, Fri','Lun, Mer, Ven':'Mon, Wed, Fri',
+    'Tue, Thu, Sat':'Tue, Thu, Sat','Mar, Jeu, Sam':'Tue, Thu, Sat',
+    'Weekly':'Weekly','Hebdomadaire':'Weekly'
+  };
+  const normFreq = FREQ_MAP[freq] || 'Custom';
+  const matchBtn = document.querySelector(`#edit-overlay .freq-btn[data-freq="${normFreq}"]`);
+  if (matchBtn) {
+    matchBtn.classList.add('selected');
+    editFreqSelected = normFreq;
+  } else {
+    // Custom frequency — pre-select days
+    document.querySelector('#edit-overlay .freq-btn[data-freq="Custom"]').classList.add('selected');
+    editFreqSelected = 'Custom';
+    document.getElementById('edit-custom-days-panel').classList.add('show');
+    const DAY_ABBREV = {'Mo':1,'Tu':2,'We':3,'Th':4,'Fr':5,'Sa':6,'Su':7,
+                        'Lu':1,'Ma':2,'Me':3,'Je':4,'Ve':5,'Di':7};
+    freq.split(', ').forEach(ab => {
+      const dayNum = DAY_ABBREV[ab.trim()];
+      if (dayNum) {
+        const btn = document.querySelector(`#edit-overlay .day-toggle[data-day="${dayNum}"]`);
+        if (btn) { btn.classList.add('on'); editCustomDays.push(dayNum); }
+      }
+    });
+  }
+ 
+  document.getElementById('edit-overlay').classList.add('show');
+};
+ 
+window.selEditFreq = function(btn) {
+  document.querySelectorAll('#edit-overlay .freq-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  editFreqSelected = btn.getAttribute('data-freq');
+  const isCustom = editFreqSelected === 'Custom';
+  document.getElementById('edit-custom-days-panel').classList.toggle('show', isCustom);
+  if (!isCustom) editCustomDays = [];
+};
+ 
+window.toggleEditDay = function(btn) {
+  btn.classList.toggle('on');
+  const day = parseInt(btn.getAttribute('data-day'));
+  if (btn.classList.contains('on')) {
+    if (!editCustomDays.includes(day)) editCustomDays.push(day);
+  } else {
+    editCustomDays = editCustomDays.filter(d => d !== day);
+  }
+};
+ 
+window.fermerEdit = function() {
+  document.getElementById('edit-overlay').classList.remove('show');
+  editKey = null;
+};
+ 
+window.fermerEditOverlay = function(e) {
+  if (e.target === document.getElementById('edit-overlay')) fermerEdit();
+};
+ 
+window.sauvegarderEdit = async function() {
+  if (!editKey || !userId) return;
+  const nom = document.getElementById('edit-nom').value.trim();
+  if (!nom) { showToast('⚠️ Please enter a name!'); return; }
+ 
+  let freqLabel;
+  let joursActifs;
+  const FREQ_JOURS_EDIT = {
+    'Daily':[1,2,3,4,5,6,7],
+    'Mon, Wed, Fri':[1,3,5],
+    'Tue, Thu, Sat':[2,4,6],
+    'Weekly':[1]
+  };
+ 
+  if (editFreqSelected === 'Custom') {
+    if (editCustomDays.length === 0) { showToast('⚠️ Select at least one day!'); return; }
+    joursActifs = [...editCustomDays].sort((a,b)=>a-b);
+    const abbrevs = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+    freqLabel = joursActifs.map(d => abbrevs[d-1]).join(', ');
+  } else {
+    freqLabel = editFreqSelected;
+    joursActifs = FREQ_JOURS_EDIT[editFreqSelected] || [1,2,3,4,5,6,7];
+  }
+ 
+  const btn = document.getElementById('edit-submit-btn');
+  btn.disabled = true; btn.textContent = '⏳ Saving...';
+ 
+  try {
+    await set(ref(db, `users/${userId}/habitudes/${editKey}/nom`), nom);
+    await set(ref(db, `users/${userId}/habitudes/${editKey}/frequence`), freqLabel);
+    await set(ref(db, `users/${userId}/habitudes/${editKey}/joursActifs`), joursActifs);
+    fermerEdit();
+    showToast('✅ Habit updated!');
+  } catch(e) {
+    showToast('❌ Update failed.');
+  }
+  btn.disabled = false; btn.textContent = '💾 SAVE CHANGES';
 };
  
 function showToast(msg) {
