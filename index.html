@@ -373,6 +373,7 @@ function renderHabitudes() {
           <div style="display:flex;align-items:center;gap:6px">
             ${isTodayChecked ? `<span style="font-size:11px;color:${coul};background:${coul}22;padding:2px 8px;border-radius:10px;font-weight:700">✓ Today</span>` : ''}
             <div class="hab-pct" style="color:${coul}">${pct}%</div>
+            <button class="hab-edit-btn" onclick="ouvrirEdit('${k}','${h.nom.replace(/'/g,"\\'")}','${(h.frequence||'Daily').replace(/'/g,"\\'")}')">✏️</button>
             <button class="hab-delete-btn" onclick="demanderSupprimer('${k}','${h.nom.replace(/'/g,"\\'")}')">🗑</button>
           </div>
         </div>
