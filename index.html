@@ -1,127 +1,142 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Mes Habitudes</title>
+<title>My Habits</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap');
-  :root {
-    --bg:#060d1a; --bg2:#0a1628; --bg3:#0f1f3d;
-    --accent:#00c8ff; --green:#00dc82; --red:#ff3c3c;
-    --orange:#ffa000; --yellow:#ffdc00; --purple:#c864ff;
-    --pink:#ff64c8; --blue:#6496ff;
-    --border:rgba(0,200,255,0.15); --text:#e0f0ff; --text2:#7890b0;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:110px;}
-  .header{background:linear-gradient(135deg,#060d1a,#0a1628);border-bottom:1px solid var(--border);padding:14px 16px 10px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
-  .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-  .logo{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;}
-  .logo span{color:var(--text);}
-  .sync-btn{background:linear-gradient(135deg,#003a5c,#005580);border:1px solid var(--accent);color:var(--accent);padding:6px 14px;border-radius:20px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;}
-  .sync-btn:active{transform:scale(.95);background:var(--accent);color:var(--bg);}
-  .tabs{display:flex;gap:6px;}
-  .tab{flex:1;padding:7px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all .2s;border:1px solid transparent;color:var(--text2);}
-  .tab.active{background:rgba(0,200,255,.12);border-color:var(--accent);color:var(--accent);}
-  .page{display:none;padding:12px;}
-  .page.active{display:block;}
-  .section-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin:16px 0 8px;border-left:3px solid var(--accent);padding-left:8px;}
-  .hab-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden;}
-  .hab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-  .hab-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;}
-  .hab-pct{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;}
-  .hab-freq{font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:6px;}
-  .hab-bar-bg{background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px;}
-  .hab-bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
-  .hab-streak{font-size:11px;color:var(--text2);}
-  .hab-streak span{color:var(--orange);font-weight:600;}
-  .score-card{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;}
-  .score-circle{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid;}
-  .score-circle-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
-  .score-info{flex:1;}
-  .score-label{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:4px;}
-  .score-month{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);}
-  .score-sub{font-size:11px;color:var(--text2);margin-top:2px;}
-  .cal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;margin-bottom:8px;}
-  .cal-month{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:1px;}
-  .cal-nav{background:var(--bg3);border:1px solid var(--border);color:var(--accent);width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;}
-  .cal-nav:active{background:var(--accent);color:var(--bg);}
-  .cal-hab-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
-  .cal-hab-title{padding:10px 12px 8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-  .cal-hab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-  .days-header{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 8px 2px;gap:3px;}
-  .day-label{text-align:center;font-size:9px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px;color:var(--text2);padding:3px 0;}
-  .days-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:4px 8px 10px;gap:3px;}
-  .day-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid transparent;position:relative;}
-  .day-cell.inactive{background:rgba(255,255,255,.02);color:rgba(255,255,255,.1);cursor:default;border-color:rgba(255,255,255,.04);}
-  .day-cell.active{background:rgba(0,0,0,.3);color:rgba(160,210,255,.7);}
-  .day-cell.active:active{transform:scale(.9);}
-  .day-cell.checked{color:white;font-weight:700;}
-  .day-cell.today-marker::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent);}
-  .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
-  .loading-icon{font-size:40px;animation:pulse 1.5s ease-in-out infinite;}
-  .loading-text{font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.95)}}
-  .empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px;letter-spacing:1px;}
-
-  /* FAB */
-  .fab{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0078a8);border:none;color:var(--bg);font-size:32px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(0,200,255,.5);transition:transform .2s,box-shadow .2s;font-weight:700;}
-  .fab:active{transform:translateX(-50%) scale(.92);}
-
-  /* MODAL */
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);}
-  .modal-overlay.show{display:flex;}
-  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-width:480px;animation:slideUp .3s ease;max-height:90vh;overflow-y:auto;}
-  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .modal-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
-  .modal-close-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .form-group{margin-bottom:16px;}
-  .form-label{font-size:11px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:block;}
-  .form-input{width:100%;padding:12px 14px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Exo 2',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
-  .form-input:focus{border-color:var(--accent);}
-  .form-input::placeholder{color:var(--text2);}
-
-  /* FREQ BUTTONS */
-  .freq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-  .freq-btn{padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;letter-spacing:.5px;}
-  .freq-btn.selected{background:rgba(0,200,255,.15);border-color:var(--accent);color:var(--accent);}
-
-  /* COULEUR BUTTONS */
-  .couleur-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
-  .couleur-btn{aspect-ratio:1;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:14px;}
-  .couleur-btn.selected{border-color:white;transform:scale(1.15);}
-
-  .submit-btn{width:100%;padding:14px;border-radius:14px;margin-top:20px;background:linear-gradient(135deg,var(--accent),#0078a8);border:none;color:var(--bg);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .2s;letter-spacing:1px;}
-  .submit-btn:hover{opacity:.9;}
-  .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
-
-  .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--accent);color:var(--accent);padding:10px 20px;border-radius:20px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;transition:transform .3s ease;z-index:999;white-space:nowrap;}
-  .toast.show{transform:translateX(-50%) translateY(0);}
-  ::-webkit-scrollbar{width:4px;}
-  ::-webkit-scrollbar-track{background:var(--bg);}
-  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap');
+:root {
+  --bg:#060d1a; --bg2:#0a1628; --bg3:#0f1f3d;
+  --accent:#00c8ff; --green:#00dc82; --red:#ff3c3c;
+  --orange:#ffa000; --yellow:#ffdc00; --purple:#c864ff;
+  --pink:#ff64c8; --blue:#6496ff;
+  --border:rgba(0,200,255,0.15); --text:#e0f0ff; --text2:#7890b0;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:110px;}
+.header{background:linear-gradient(135deg,#060d1a,#0a1628);border-bottom:1px solid var(--border);padding:14px 16px 10px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.logo{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;}
+.logo span{color:var(--text);}
+.sync-btn{background:linear-gradient(135deg,#003a5c,#005580);border:1px solid var(--accent);color:var(--accent);padding:6px 14px;border-radius:20px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;}
+.sync-btn:active{transform:scale(.95);background:var(--accent);color:var(--bg);}
+.tabs{display:flex;gap:6px;}
+.tab{flex:1;padding:7px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all .2s;border:1px solid transparent;color:var(--text2);}
+.tab.active{background:rgba(0,200,255,.12);border-color:var(--accent);color:var(--accent);}
+.page{display:none;padding:12px;}
+.page.active{display:block;}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin:16px 0 8px;border-left:3px solid var(--accent);padding-left:8px;}
+.hab-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden;}
+.hab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.hab-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;}
+.hab-pct{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;}
+.hab-freq{font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:6px;}
+.hab-bar-bg{background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px;}
+.hab-bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+.hab-streak{font-size:11px;color:var(--text2);}
+.hab-streak span{color:var(--orange);font-weight:600;}
+/* Delete button on habit card */
+.hab-delete-btn{background:rgba(255,60,60,.12);border:1px solid rgba(255,60,60,.3);color:#ff6060;font-size:14px;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;margin-left:6px;}
+.hab-delete-btn:active{background:rgba(255,60,60,.35);transform:scale(.9);}
+.score-card{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;}
+.score-circle{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid;}
+.score-circle-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
+.score-info{flex:1;}
+.score-label{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:4px;}
+.score-month{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);}
+.score-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;margin-bottom:8px;}
+.cal-month{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:1px;}
+.cal-nav{background:var(--bg3);border:1px solid var(--border);color:var(--accent);width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;}
+.cal-nav:active{background:var(--accent);color:var(--bg);}
+.cal-hab-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.cal-hab-title{padding:10px 12px 8px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.cal-hab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.days-header{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 8px 2px;gap:3px;}
+.day-label{text-align:center;font-size:9px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px;color:var(--text2);padding:3px 0;}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:4px 8px 10px;gap:3px;}
+.day-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid transparent;position:relative;}
+.day-cell.inactive{background:rgba(255,255,255,.02);color:rgba(255,255,255,.1);cursor:default;border-color:rgba(255,255,255,.04);}
+.day-cell.active{background:rgba(0,0,0,.3);color:rgba(160,210,255,.7);}
+.day-cell.active:active{transform:scale(.9);}
+.day-cell.checked{color:white;font-weight:700;}
+.day-cell.today-marker::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent);}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.loading-icon{font-size:40px;animation:pulse 1.5s ease-in-out infinite;}
+.loading-text{font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.95)}}
+.empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px;letter-spacing:1px;}
+/* FAB */
+.fab{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0078a8);border:none;color:var(--bg);font-size:32px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(0,200,255,.5);transition:transform .2s,box-shadow .2s;font-weight:700;}
+.fab:active{transform:translateX(-50%) scale(.92);}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-width:480px;animation:slideUp .3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+.modal-close-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:11px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:block;}
+.form-input{width:100%;padding:12px 14px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Exo 2',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--accent);}
+.form-input::placeholder{color:var(--text2);}
+/* FREQ BUTTONS */
+.freq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.freq-btn{padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;letter-spacing:.5px;}
+.freq-btn.selected{background:rgba(0,200,255,.15);border-color:var(--accent);color:var(--accent);}
+/* CUSTOM DAYS */
+.custom-days-panel{display:none;margin-top:10px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.custom-days-panel.show{display:block;}
+.custom-days-label{font-size:10px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.day-toggle-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.day-toggle{aspect-ratio:1;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.day-toggle.on{background:rgba(0,200,255,.2);border-color:var(--accent);color:var(--accent);}
+/* COULEUR BUTTONS */
+.couleur-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+.couleur-btn{aspect-ratio:1;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.couleur-btn.selected{border-color:white;transform:scale(1.15);}
+.submit-btn{width:100%;padding:14px;border-radius:14px;margin-top:20px;background:linear-gradient(135deg,var(--accent),#0078a8);border:none;color:var(--bg);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .2s;letter-spacing:1px;}
+.submit-btn:hover{opacity:.9;}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+/* CONFIRM DELETE MODAL */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.confirm-overlay.show{display:flex;}
+.confirm-box{background:var(--bg2);border:1px solid rgba(255,60,60,.4);border-radius:20px;padding:24px 20px;width:90%;max-width:340px;text-align:center;}
+.confirm-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#ff6060;letter-spacing:1px;margin-bottom:8px;}
+.confirm-name{font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--text);margin-bottom:20px;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-btn{flex:1;padding:12px;border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;letter-spacing:1px;}
+.confirm-btn.cancel{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.confirm-btn.delete{background:rgba(255,60,60,.2);color:#ff6060;border:1px solid rgba(255,60,60,.4);}
+.confirm-btn.delete:active{background:rgba(255,60,60,.4);}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--accent);color:var(--accent);padding:10px 20px;border-radius:20px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;transition:transform .3s ease;z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
-
+ 
 <div class="header">
   <div class="header-top">
-    <div class="logo">🔥 <span>MES</span> HABITUDES</div>
+    <div class="logo">🔥 <span>MY</span> HABITS</div>
     <button class="sync-btn" onclick="syncNow()">↻ SYNC</button>
   </div>
   <div class="tabs">
-    <div class="tab active" onclick="showPage('habitudes',event)">📊 HABITUDES</div>
-    <div class="tab" onclick="showPage('calendrier',event)">📅 CALENDRIER</div>
+    <div class="tab active" onclick="showPage('habitudes',event)">📊 HABITS</div>
+    <div class="tab" onclick="showPage('calendrier',event)">📅 CALENDAR</div>
   </div>
 </div>
-
+ 
 <div id="page-habitudes" class="page active">
   <div id="habitudes-content">
-    <div class="loading"><div class="loading-icon">🔥</div><div class="loading-text">Chargement...</div></div>
+    <div class="loading"><div class="loading-icon">🔥</div><div class="loading-text">Loading...</div></div>
   </div>
 </div>
-
+ 
 <div id="page-calendrier" class="page">
   <div class="cal-header">
     <div class="cal-nav" onclick="changeMonth(-1)">‹</div>
@@ -129,38 +144,49 @@
     <div class="cal-nav" onclick="changeMonth(1)">›</div>
   </div>
   <div id="calendrier-content">
-    <div class="loading"><div class="loading-icon">📅</div><div class="loading-text">Chargement...</div></div>
+    <div class="loading"><div class="loading-icon">📅</div><div class="loading-text">Loading...</div></div>
   </div>
 </div>
-
+ 
 <!-- FAB -->
 <button class="fab" onclick="ouvrirModal()">+</button>
-
-<!-- MODAL AJOUT HABITUDE -->
+ 
+<!-- MODAL ADD HABIT -->
 <div class="modal-overlay" id="modal-overlay" onclick="fermerModalOverlay(event)">
   <div class="modal">
     <div class="modal-title">
-      ➕ NOUVELLE HABITUDE
+      ➕ NEW HABIT
       <button class="modal-close-btn" onclick="fermerModal()">✕</button>
     </div>
-
     <div class="form-group">
-      <label class="form-label">Nom de l'habitude</label>
-      <input class="form-input" id="inp-nom" type="text" placeholder="Ex: Sport, Lecture..."/>
+      <label class="form-label">Habit Name</label>
+      <input class="form-input" id="inp-nom" type="text" placeholder="Ex: Sport, Reading..."/>
     </div>
-
     <div class="form-group">
-      <label class="form-label">Fréquence</label>
+      <label class="form-label">Frequency</label>
       <div class="freq-grid">
-        <button class="freq-btn selected" data-freq="Quotidien" onclick="selFreq(this)">📅 Quotidien</button>
-        <button class="freq-btn" data-freq="Lun, Mer, Ven" onclick="selFreq(this)">📆 Lun, Mer, Ven</button>
-        <button class="freq-btn" data-freq="Mar, Jeu, Sam" onclick="selFreq(this)">📆 Mar, Jeu, Sam</button>
-        <button class="freq-btn" data-freq="Hebdomadaire" onclick="selFreq(this)">🗓 Hebdomadaire</button>
+        <button class="freq-btn selected" data-freq="Daily" onclick="selFreq(this)">📅 Daily</button>
+        <button class="freq-btn" data-freq="Mon, Wed, Fri" onclick="selFreq(this)">📆 Mon, Wed, Fri</button>
+        <button class="freq-btn" data-freq="Tue, Thu, Sat" onclick="selFreq(this)">📆 Tue, Thu, Sat</button>
+        <button class="freq-btn" data-freq="Weekly" onclick="selFreq(this)">🗓 Weekly</button>
+        <button class="freq-btn" data-freq="Custom" onclick="selFreq(this)" style="grid-column:span 2">⚙️ Custom...</button>
+      </div>
+      <!-- Custom day picker -->
+      <div class="custom-days-panel" id="custom-days-panel">
+        <div class="custom-days-label">Select active days</div>
+        <div class="day-toggle-grid">
+          <button class="day-toggle" data-day="1" onclick="toggleDay(this)">Mo</button>
+          <button class="day-toggle" data-day="2" onclick="toggleDay(this)">Tu</button>
+          <button class="day-toggle" data-day="3" onclick="toggleDay(this)">We</button>
+          <button class="day-toggle" data-day="4" onclick="toggleDay(this)">Th</button>
+          <button class="day-toggle" data-day="5" onclick="toggleDay(this)">Fr</button>
+          <button class="day-toggle" data-day="6" onclick="toggleDay(this)">Sa</button>
+          <button class="day-toggle" data-day="7" onclick="toggleDay(this)">Su</button>
+        </div>
       </div>
     </div>
-
     <div class="form-group">
-      <label class="form-label">Couleur</label>
+      <label class="form-label">Color</label>
       <div class="couleur-grid" id="couleur-grid">
         <button class="couleur-btn selected" data-rang="0" style="background:#00dc82" onclick="selCouleur(this)"></button>
         <button class="couleur-btn" data-rang="1" style="background:#ff6464" onclick="selCouleur(this)"></button>
@@ -170,19 +196,30 @@
         <button class="couleur-btn" data-rang="5" style="background:#ff64c8" onclick="selCouleur(this)"></button>
       </div>
     </div>
-
     <button class="submit-btn" id="submit-btn" onclick="ajouterHabitude()">
-      ✅ AJOUTER L'HABITUDE
+      ✅ ADD HABIT
     </button>
   </div>
 </div>
-
+ 
+<!-- CONFIRM DELETE MODAL -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title">🗑 Delete Habit?</div>
+    <div class="confirm-name" id="confirm-name"></div>
+    <div class="confirm-btns">
+      <button class="confirm-btn cancel" onclick="annulerSupprimer()">Cancel</button>
+      <button class="confirm-btn delete" onclick="confirmerSupprimer()">Delete</button>
+    </div>
+  </div>
+</div>
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+ 
 const firebaseConfig = {
   apiKey: "AIzaSyBjWyHxE9c7EWPp_0NjUaNGglGs-nBAys0",
   authDomain: "mes-habitudes-c22ce.firebaseapp.com",
@@ -192,32 +229,41 @@ const firebaseConfig = {
   messagingSenderId: "484575815535",
   appId: "1:484575815535:web:b2e5cde0cc1581b1ecea9a"
 };
-
+ 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
 const params = new URLSearchParams(window.location.search);
 const userId = params.get('uid');
-
+ 
 let userData = null;
 let currentMonth = new Date().getMonth() + 1;
-let currentYear  = new Date().getFullYear();
-let freqSelectionnee  = "Quotidien";
-let rangSelectionne   = 0;
-
+let currentYear = new Date().getFullYear();
+let freqSelectionnee = "Daily";
+let rangSelectionne = 0;
+let customDaysSelected = [];   // for custom frequency
+let pendingDeleteKey = null;   // for delete confirm
+ 
 const COULEURS = {0:'#00dc82',1:'#ff6464',2:'#6496ff',3:'#ffb400',4:'#c864ff',5:'#ff64c8'};
+ 
+// Frequency → active day numbers (1=Mon ... 7=Sun)
 const FREQ_JOURS = {
-  "Quotidien":    [1,2,3,4,5,6,7],
-  "Lun, Mer, Ven":[1,3,5],
-  "Mar, Jeu, Sam":[2,4,6],
-  "Hebdomadaire": [1]
+  "Daily":          [1,2,3,4,5,6,7],
+  "Mon, Wed, Fri":  [1,3,5],
+  "Tue, Thu, Sat":  [2,4,6],
+  "Weekly":         [1],
+  // French legacy labels — keep for backward compat with Excel sync
+  "Quotidien":      [1,2,3,4,5,6,7],
+  "Lun, Mer, Ven":  [1,3,5],
+  "Mar, Jeu, Sam":  [2,4,6],
+  "Hebdomadaire":   [1]
 };
-const MOIS_FR = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const JOURS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-
+ 
+const MONTHS = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_NAMES = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+ 
 if (!userId) {
   document.getElementById('habitudes-content').innerHTML =
-    `<div class="empty">❌ QR Code invalide<br><br>Régénère le QR Code depuis Excel</div>`;
+    `<div class="empty">❌ Invalid QR Code<br><br>Regenerate the QR Code from Excel</div>`;
 } else {
   const userRef = ref(db, 'users/' + userId);
   onValue(userRef, snapshot => {
@@ -226,47 +272,52 @@ if (!userId) {
     renderCalendrier();
   });
 }
-
-// ===== RENDER HABITUDES =====
+ 
+// ===== RENDER HABITS =====
 function renderHabitudes() {
   const container = document.getElementById('habitudes-content');
   if (!userData || !userData.habitudes) {
-    container.innerHTML = `<div class="empty">Aucune habitude trouvée<br><br>Synchronise depuis Excel ou ajoute avec +</div>`;
+    container.innerHTML = `<div class="empty">No habits found<br><br>Sync from Excel or add with +</div>`;
     return;
   }
+ 
   const habs = userData.habitudes;
-  const keys = Object.keys(habs);
+  const keys = Object.keys(habs).filter(k => habs[k] && habs[k].nom);
+ 
+  // Compute global average for score card
   let totalPct = 0, nb = 0;
-  keys.forEach(k => { if (habs[k] && habs[k].pct !== undefined) { totalPct += habs[k].pct; nb++; } });
+  keys.forEach(k => { totalPct += (habs[k].pct || 0); nb++; });
   const moyenne = nb > 0 ? Math.round(totalPct / nb) : 0;
   const coulScore = moyenne < 26 ? '#ff3c3c' : moyenne < 51 ? '#ffa000' : moyenne < 76 ? '#ffdc00' : '#00dc82';
-
+ 
   let html = `
     <div class="score-card">
       <div class="score-circle" style="border-color:${coulScore}">
         <div class="score-circle-val" style="color:${coulScore}">${moyenne}%</div>
       </div>
       <div class="score-info">
-        <div class="score-label">Score de focus</div>
-        <div class="score-month">${MOIS_FR[currentMonth]} ${currentYear}</div>
-        <div class="score-sub">${nb} habitude${nb>1?'s':''} suivie${nb>1?'s':''}</div>
+        <div class="score-label">Focus Score</div>
+        <div class="score-month">${MONTHS[currentMonth]} ${currentYear}</div>
+        <div class="score-sub">${nb} habit${nb!==1?'s':''} tracked</div>
       </div>
     </div>
-    <div class="section-title">Mes habitudes</div>
+    <div class="section-title">My Habits</div>
   `;
-
+ 
   keys.forEach((k, i) => {
     const h = habs[k];
-    if (!h || !h.nom) return;
     const coul = COULEURS[i % 6];
     const pct = h.pct || 0;
     const streak = h.streak || 0;
     const today = new Date();
     const todayKey = String(today.getDate()).padStart(2,'0') +
-      String(today.getMonth()+1).padStart(2,'0') + today.getFullYear();
-    const isTodayCoche = userData.cases && userData.cases[k] && userData.cases[k][todayKey] === true;
+                     String(today.getMonth()+1).padStart(2,'0') + today.getFullYear();
+    const isTodayChecked = userData.cases?.[k]?.[todayKey] === true;
     const isMob = k.includes('_mob_');
-
+ 
+    // Normalize frequency label
+    const freqLabel = normalizeFreqLabel(h.frequence || '');
+ 
     html += `
       <div class="hab-card" style="border-color:${coul}33">
         <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${coul};border-radius:3px 0 0 3px"></div>
@@ -275,56 +326,75 @@ function renderHabitudes() {
             <div class="hab-name" style="color:${coul}">${h.nom}</div>
             ${isMob ? `<span style="font-size:10px;color:var(--accent);background:rgba(0,200,255,.1);padding:1px 6px;border-radius:8px">📱</span>` : ''}
           </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${isTodayCoche ? `<span style="font-size:11px;color:${coul};background:${coul}22;padding:2px 8px;border-radius:10px;font-weight:700">✓ Auj.</span>` : ''}
+          <div style="display:flex;align-items:center;gap:6px">
+            ${isTodayChecked ? `<span style="font-size:11px;color:${coul};background:${coul}22;padding:2px 8px;border-radius:10px;font-weight:700">✓ Today</span>` : ''}
             <div class="hab-pct" style="color:${coul}">${pct}%</div>
+            <button class="hab-delete-btn" onclick="demanderSupprimer('${k}','${h.nom.replace(/'/g,"\\'")}')">🗑</button>
           </div>
         </div>
-        <div class="hab-freq">${h.frequence || ''}</div>
+        <div class="hab-freq">${freqLabel}</div>
         <div class="hab-bar-bg">
           <div class="hab-bar-fill" style="width:${pct}%;background:${coul}"></div>
         </div>
-        <div class="hab-streak">🔥 <span>${streak} jours</span> consécutifs</div>
+        <div class="hab-streak">🔥 <span>${streak} days</span> in a row</div>
       </div>
     `;
   });
+ 
   container.innerHTML = html;
 }
-
-// ===== RENDER CALENDRIER =====
+ 
+// Translate French frequency labels to English for display
+function normalizeFreqLabel(freq) {
+  const map = {
+    'Quotidien': 'Daily',
+    'Hebdomadaire': 'Weekly',
+    'Lun, Mer, Ven': 'Mon, Wed, Fri',
+    'Mar, Jeu, Sam': 'Tue, Thu, Sat',
+    'Lu, Ma, Je, Ve, Di': 'Mo, Tu, Th, Fr, Su',
+    'Lu, Ma, Ve, Sa': 'Mo, Tu, Fr, Sa',
+  };
+  return map[freq] || freq;
+}
+ 
+// ===== RENDER CALENDAR =====
 function renderCalendrier() {
   const container = document.getElementById('calendrier-content');
-  document.getElementById('cal-month-title').textContent = MOIS_FR[currentMonth] + ' ' + currentYear;
+  document.getElementById('cal-month-title').textContent = MONTHS[currentMonth] + ' ' + currentYear;
   if (!userData || !userData.habitudes) {
-    container.innerHTML = `<div class="empty">Synchronise depuis Excel d'abord</div>`;
+    container.innerHTML = `<div class="empty">Sync from Excel first</div>`;
     return;
   }
+ 
   const habs = userData.habitudes;
-  const keys = Object.keys(habs);
+  const keys = Object.keys(habs).filter(k => habs[k] && habs[k].nom);
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
   const today = new Date();
-  const dayNames = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+ 
   let html = '';
-
   keys.forEach((k, i) => {
     const h = habs[k];
-    if (!h || !h.nom) return;
     const coul = COULEURS[i % 6];
-    const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
-    const cases = (userData.cases && userData.cases[k]) ? userData.cases[k] : {};
-
+    let joursActifs = h.joursActifs;
+    if (!joursActifs || !joursActifs.length) {
+      joursActifs = FREQ_JOURS[h.frequence] || [1,2,3,4,5,6,7];
+    }
+    const cases = userData.cases?.[k] || {};
+ 
     html += `
       <div class="cal-hab-section">
         <div class="cal-hab-title">
           <div class="cal-hab-dot" style="background:${coul}"></div>
           <span style="color:${coul}">${h.nom}</span>
         </div>
-        <div class="days-header">${dayNames.map(d=>`<div class="day-label">${d}</div>`).join('')}</div>
+        <div class="days-header">${DAY_NAMES.map(d=>`<div class="day-label">${d}</div>`).join('')}</div>
         <div class="days-grid">
     `;
+ 
     const firstDay = new Date(currentYear, currentMonth-1, 1).getDay();
     const offset = firstDay === 0 ? 6 : firstDay - 1;
     for (let ii=0; ii<offset; ii++) html += `<div class="day-cell inactive"></div>`;
+ 
     for (let d=1; d<=daysInMonth; d++) {
       const dateObj = new Date(currentYear, currentMonth-1, d);
       const jourSem = dateObj.getDay() === 0 ? 7 : dateObj.getDay();
@@ -332,6 +402,7 @@ function renderCalendrier() {
       const dateKey = String(d).padStart(2,'0') + String(currentMonth).padStart(2,'0') + currentYear;
       const isCoche = cases[dateKey] === true;
       const isToday = today.getDate()===d && today.getMonth()+1===currentMonth && today.getFullYear()===currentYear;
+ 
       if (!isActif) {
         html += `<div class="day-cell inactive">${d}</div>`;
       } else if (isCoche) {
@@ -342,22 +413,28 @@ function renderCalendrier() {
     }
     html += `</div></div>`;
   });
-  container.innerHTML = html || `<div class="empty">Aucune habitude à afficher</div>`;
+ 
+  container.innerHTML = html || `<div class="empty">No habits to display</div>`;
 }
-
+ 
 // ===== TOGGLE CASE =====
 window.toggleCase = async function(habKey, dateKey, wasCoche) {
   if (!userId) return;
   const newVal = !wasCoche;
+  // Optimistic update
+  if (!userData.cases) userData.cases = {};
+  if (!userData.cases[habKey]) userData.cases[habKey] = {};
+  userData.cases[habKey][dateKey] = newVal;
   await set(ref(db, `users/${userId}/cases/${habKey}/${dateKey}`), newVal);
-  showToast(newVal ? '✅ Coché !' : '○ Décoché');
+  showToast(newVal ? '✅ Checked!' : '○ Unchecked');
   recalcPct(habKey);
 };
-
+ 
 async function recalcPct(habKey) {
   if (!userData?.habitudes?.[habKey]) return;
   const h = userData.habitudes[habKey];
-  const joursActifs = h.joursActifs || [1,2,3,4,5,6,7];
+  let joursActifs = h.joursActifs;
+  if (!joursActifs || !joursActifs.length) joursActifs = FREQ_JOURS[h.frequence] || [1,2,3,4,5,6,7];
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
   const cases = userData.cases?.[habKey] || {};
   let totalA=0, totalC=0;
@@ -371,88 +448,140 @@ async function recalcPct(habKey) {
     }
   }
   const pct = totalA>0 ? Math.round((totalC/totalA)*100) : 0;
+  // Real consecutive streak from today backwards
+  let streak = 0;
+  const td = new Date();
+  for (let d=td.getDate(); d>=1; d--) {
+    const dateObj = new Date(td.getFullYear(), td.getMonth(), d);
+    const jourSem = dateObj.getDay()===0 ? 7 : dateObj.getDay();
+    if (!joursActifs.includes(jourSem)) continue; // skip inactive days
+    const dk = String(d).padStart(2,'0') + String(td.getMonth()+1).padStart(2,'0') + td.getFullYear();
+    if (cases[dk]) { streak++; } else { break; }
+  }
+  // Update local userData so re-render is immediate
+  userData.habitudes[habKey].pct = pct;
+  userData.habitudes[habKey].streak = streak;
   await set(ref(db, `users/${userId}/habitudes/${habKey}/pct`), pct);
-  await set(ref(db, `users/${userId}/habitudes/${habKey}/streak`), totalC);
+  await set(ref(db, `users/${userId}/habitudes/${habKey}/streak`), streak);
+  renderHabitudes();
 }
-
-// ===== MODAL FAB =====
+ 
+// ===== DELETE HABIT =====
+window.demanderSupprimer = function(key, nom) {
+  pendingDeleteKey = key;
+  document.getElementById('confirm-name').textContent = `"${nom}"`;
+  document.getElementById('confirm-overlay').classList.add('show');
+};
+window.annulerSupprimer = function() {
+  pendingDeleteKey = null;
+  document.getElementById('confirm-overlay').classList.remove('show');
+};
+window.confirmerSupprimer = async function() {
+  if (!pendingDeleteKey || !userId) return;
+  const key = pendingDeleteKey;
+  document.getElementById('confirm-overlay').classList.remove('show');
+  pendingDeleteKey = null;
+  try {
+    await set(ref(db, `users/${userId}/habitudes/${key}`), null);
+    await set(ref(db, `users/${userId}/cases/${key}`), null);
+    showToast('🗑 Habit deleted');
+  } catch(e) {
+    showToast('❌ Delete failed');
+  }
+};
+ 
+// ===== MODAL ADD HABIT =====
 window.ouvrirModal = function() {
   document.getElementById('inp-nom').value = '';
-  // Reset freq
+  customDaysSelected = [];
   document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelector('[data-freq="Quotidien"]').classList.add('selected');
-  freqSelectionnee = 'Quotidien';
-  // Reset couleur
+  document.querySelector('[data-freq="Daily"]').classList.add('selected');
+  freqSelectionnee = 'Daily';
+  document.getElementById('custom-days-panel').classList.remove('show');
+  document.querySelectorAll('.day-toggle').forEach(b => b.classList.remove('on'));
   document.querySelectorAll('.couleur-btn').forEach(b => b.classList.remove('selected'));
   document.querySelector('[data-rang="0"]').classList.add('selected');
   rangSelectionne = 0;
   document.getElementById('modal-overlay').classList.add('show');
 };
-
+ 
 window.selFreq = function(btn) {
   document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   freqSelectionnee = btn.getAttribute('data-freq');
+  const isCustom = freqSelectionnee === 'Custom';
+  document.getElementById('custom-days-panel').classList.toggle('show', isCustom);
+  if (!isCustom) customDaysSelected = [];
 };
-
+ 
+window.toggleDay = function(btn) {
+  btn.classList.toggle('on');
+  const day = parseInt(btn.getAttribute('data-day'));
+  if (btn.classList.contains('on')) {
+    if (!customDaysSelected.includes(day)) customDaysSelected.push(day);
+  } else {
+    customDaysSelected = customDaysSelected.filter(d => d !== day);
+  }
+};
+ 
 window.selCouleur = function(btn) {
   document.querySelectorAll('.couleur-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   rangSelectionne = parseInt(btn.getAttribute('data-rang'));
 };
-
+ 
 window.ajouterHabitude = async function() {
   const nom = document.getElementById('inp-nom').value.trim();
-  if (!nom) { showToast('⚠️ Entrez un nom !'); return; }
-  if (!userId) { showToast('⚠️ Pas d\'identifiant !'); return; }
-
-  // Vérifier max 6 habitudes
-  const nbActuel = userData?.habitudes ? Object.keys(userData.habitudes).length : 0;
-  if (nbActuel >= 6) { showToast('⚠️ Maximum 6 habitudes !'); return; }
-
+  if (!nom) { showToast('⚠️ Please enter a name!'); return; }
+  if (!userId) { showToast('⚠️ No user ID!'); return; }
+ 
+  const nbActuel = userData?.habitudes ? Object.keys(userData.habitudes).filter(k => userData.habitudes[k]?.nom).length : 0;
+  if (nbActuel >= 6) { showToast('⚠️ Maximum 6 habits!'); return; }
+ 
+  // Build joursActifs
+  let joursActifs;
+  let freqLabel;
+  if (freqSelectionnee === 'Custom') {
+    if (customDaysSelected.length === 0) { showToast('⚠️ Select at least one day!'); return; }
+    joursActifs = [...customDaysSelected].sort((a,b)=>a-b);
+    const dayAbbrev = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+    freqLabel = joursActifs.map(d => dayAbbrev[d-1]).join(', ');
+  } else {
+    joursActifs = FREQ_JOURS[freqSelectionnee] || [1,2,3,4,5,6,7];
+    freqLabel = freqSelectionnee;
+  }
+ 
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Enregistrement...';
-
-  // Clé unique mobile
+  btn.disabled = true; btn.textContent = '⏳ Saving...';
+ 
   const rand = Math.random().toString(36).substring(2,6);
   const cle = 'hab_mob_' + rand;
-
-  const joursActifs = FREQ_JOURS[freqSelectionnee] || [1,2,3,4,5,6,7];
-
   const habData = {
-    nom: nom,
-    frequence: freqSelectionnee,
-    joursActifs: joursActifs,
-    rang: rangSelectionne,
-    pct: 0,
-    streak: 0,
-    source: 'mobile',
-    createdAt: new Date().toISOString()
+    nom, frequence: freqLabel, joursActifs,
+    rang: rangSelectionne, pct: 0, streak: 0,
+    source: 'mobile', createdAt: new Date().toISOString()
   };
-
+ 
   try {
     await set(ref(db, `users/${userId}/habitudes/${cle}`), habData);
     fermerModal();
-    showToast('✅ Habitude ajoutée ! Sync Excel pour la voir.');
+    showToast('✅ Habit added! Sync Excel to see it.');
   } catch(e) {
-    showToast('❌ Erreur lors de l\'enregistrement.');
+    showToast('❌ Save failed.');
   }
-
-  btn.disabled = false;
-  btn.textContent = '✅ AJOUTER L\'HABITUDE';
+  btn.disabled = false; btn.textContent = '✅ ADD HABIT';
 };
-
+ 
 window.fermerModal = function() { document.getElementById('modal-overlay').classList.remove('show'); };
 window.fermerModalOverlay = function(e) { if (e.target===document.getElementById('modal-overlay')) fermerModal(); };
-
+ 
 window.changeMonth = function(dir) {
   currentMonth += dir;
   if (currentMonth>12){currentMonth=1;currentYear++;}
   if (currentMonth<1){currentMonth=12;currentYear--;}
   renderCalendrier();
 };
-
+ 
 window.showPage = function(page, event) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -460,12 +589,12 @@ window.showPage = function(page, event) {
   if (event?.target) event.target.classList.add('active');
   if (page==='calendrier') renderCalendrier();
 };
-
+ 
 window.syncNow = function() {
-  showToast('↻ Synchronisation...');
-  if (userData) { renderHabitudes(); renderCalendrier(); showToast('✅ Synchronisé !'); }
+  showToast('↻ Syncing...');
+  if (userData) { renderHabitudes(); renderCalendrier(); showToast('✅ Synced!'); }
 };
-
+ 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
